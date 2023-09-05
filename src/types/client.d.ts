@@ -1,7 +1,7 @@
 import { Client, Collection } from 'discord.js';
 import { Command } from './commands/types/Command';
 interface CustomCommand {
-	async execute(interaction: Interaction): Promise<void>;
+	execute(interaction: Interaction): Promise<void>;
     data: {
         name: string
     }
