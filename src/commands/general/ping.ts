@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Message } from "discord.js";
 import { botcolor } from "../../config.json";
 
 // -----------------------------------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ module.exports = {
     // 処理
     // -----------------------------------------------------------------------------------------------------------
     async execute(interaction: CommandInteraction) {
-        const pingEmbed = new EmbedBuilder()
+        const pingEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle("Pingを測定中")
             .setDescription("測定中...")
             .setColor(Number(botcolor))
@@ -22,7 +22,7 @@ module.exports = {
             embeds: [pingEmbed],
             allowedMentions: { repliedUser: false }
         });
-        const message = await interaction.fetchReply();
+        const message: Message<boolean> = await interaction.fetchReply();
         await interaction.editReply({
             embeds: [pingEmbed.setTitle("Pingを測定しました").setDescription(null).setFields(
                 { name: "WebSocket Ping", value: `${interaction.client.ws.ping}ms` },

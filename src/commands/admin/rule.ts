@@ -2,8 +2,8 @@ import { Interaction, SlashCommandBuilder, StringSelectMenuInteraction } from "d
 import { languageMenu, embeds, agreeButton } from "../../module/ruledata";
 import { appendFile } from "../../module/apped_file";
 
-const timenow = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
-const memberRole = "712572415850315807";
+const timenow: string = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
+const memberRole: string = "712572415850315807";
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -22,7 +22,7 @@ module.exports = {
         // -----------------------------------------------------------------------------------------------------------
         if (!interaction.isStringSelectMenu()&&!interaction.isButton()) return;
         if (interaction.customId === "selectlanguage") { // 言語を選択した時の処理
-            const page = Number((interaction as StringSelectMenuInteraction).values[0].split("_")[1]);
+            const page: number = Number((interaction as StringSelectMenuInteraction).values[0].split("_")[1]);
             await interaction.reply({
                 embeds: [embeds.rule[page]],
                 ephemeral: true,
@@ -31,7 +31,7 @@ module.exports = {
         };
         if (interaction.customId === "agreebutton") {  // 利用規約に同意した時の処理
             try {
-                const role = interaction.member.roles.cache.has(memberRole);
+                const role: boolean = interaction.member.roles.cache.has(memberRole);
                 if (!role) {
                     interaction.member.roles.add(memberRole);
                     await interaction.reply({
