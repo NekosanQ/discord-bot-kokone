@@ -5,6 +5,7 @@ module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction: Interaction): Promise<void> {
 		let commandName: string;
+		// インタラクションの種類によってcommandNameを取得
 		if (interaction.isChatInputCommand()) {
 			commandName = interaction.commandName;
 		} else if (interaction.isStringSelectMenu()&&interaction.message.interaction != null) {	
