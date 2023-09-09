@@ -20,7 +20,7 @@ module.exports = {
         const welcomeMessageEmbed: IwelcomeMessageEmbed = {
             entrance: new EmbedBuilder()
                 .setTitle(`__❀ᴡᴇʟᴄᴏᴍᴇ to ${member.guild.name}❀__！`)
-                .setDescription(`<@${member.displayName}>さんようこそ！\n${member.guild.name}へ！\n<#685127547662630954>\n利用規約を見てください！\nLet's confirm the rules!\n${member.guild.memberCount}人目の入室者です！`)
+                .setDescription(`<@${member.id}> さんようこそ！\n${member.guild.name}へ！\n<#685127547662630954>\n利用規約を見てください！\nLet's confirm the rules!\n${member.guild.memberCount}人目の入室者です！`)
                 .setColor(Number(botcolor))
                 .setThumbnail(member.user.avatarURL())
                 .setTimestamp()
