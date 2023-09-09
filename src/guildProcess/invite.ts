@@ -50,8 +50,8 @@ module.exports = {
                 for (let n = 0; n < inviteRoleId.length; n++) { // 募集通知のロールがあるか確認
                     if (key == inviteRoleId[n]) { // 募集通知のロールがあった場合の処理
                         inviteMentionCount++; // 募集通知カウントを増やす
-                    }
-                }
+                    };
+                };
             };
             if (inviteMentionCount == messageRole.size) { // 募集通知のロールのみメンションされていた場合の処理
                 await message.react(message.guild?.emojis.cache.get(checkmarkId) ?? "");

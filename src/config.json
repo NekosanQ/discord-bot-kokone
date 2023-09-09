@@ -2,6 +2,7 @@
 	"clientId": "877222927517515836",
 	"developerGuildId": "954075863505309767",
     "generalGuildId": "685035498699620377",
+	"ManagementChannelId": "734763834060963850",
 	"prefix": "k/",
 	"botcolor": "0xb9d98b",
     "errorcolor": "0xf06060"

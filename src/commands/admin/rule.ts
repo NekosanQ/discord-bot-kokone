@@ -1,6 +1,6 @@
 import { Interaction, SlashCommandBuilder, StringSelectMenuInteraction } from "discord.js";
 import { languageMenu, embeds, agreeButton } from "../../module/ruledata";
-import { appendFile } from "../../module/apped_file";
+import { appendFile } from "../../module/file/appedFile";
 
 const timenow: string = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
 const memberRole: string = "712572415850315807";
@@ -39,7 +39,7 @@ module.exports = {
                         ephemeral: true,
                     });
                     console.log(`[${timenow}] 利用規約に同意しました <実行ユーザー/ID>: ${interaction.user.tag}/${interaction.user.id}`);
-                    appendFile(`[${timenow}] 利用規約に同意しました <実行ユーザー/ID>: ${interaction.user.tag}/${interaction.user.id}\n`);
+                    appendFile("logs/rule.log", `[${timenow}] 利用規約に同意しました <実行ユーザー/ID>: ${interaction.user.tag}/${interaction.user.id}\n`);
                 } else {
                     await interaction.reply({
                         embeds: [embeds.authenticated],
