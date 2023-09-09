@@ -4,7 +4,7 @@ module.exports = {
 		.setName("log")
 		.setDescription("ログを送信します"),
 	async execute(interaction: CommandInteraction): Promise<void> {
-        console.log(interaction)
+        console.log(interaction);
 		await interaction.reply({
             content: "成功",
             allowedMentions: { repliedUser: false }

@@ -2,15 +2,12 @@ import { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Message } from "
 import { botcolor } from "../../config.json";
 
 // -----------------------------------------------------------------------------------------------------------
-// コマンド処理
+// Ping処理
 // -----------------------------------------------------------------------------------------------------------
 module.exports = {
     data: new SlashCommandBuilder() // スラッシュコマンド
 		.setName('ping')
 		.setDescription('pingを表示します'),
-    // -----------------------------------------------------------------------------------------------------------
-    // 処理
-    // -----------------------------------------------------------------------------------------------------------
     async execute(interaction: CommandInteraction) {
         const pingEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle("Pingを測定中")

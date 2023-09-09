@@ -1,8 +1,9 @@
 import { Interaction, SlashCommandBuilder, StringSelectMenuInteraction } from "discord.js";
 import { languageMenu, embeds, agreeButton } from "../../module/ruledata";
 import { appendFile } from "../../module/file/appedFile";
-
-const timenow: string = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
+import log4js from 'log4js';
+const logger = log4js.getLogger();
+logger.level = "info";
 const memberRole: string = "712572415850315807";
 
 module.exports = {
@@ -10,6 +11,7 @@ module.exports = {
         .setName("rule")
         .setDescription("利用規約を作成します"),
     async execute(interaction: Interaction<"cached">): Promise<void> {
+        const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         if (interaction.isChatInputCommand()) {
             await interaction.reply({
                 embeds: [embeds.rule[0]],
@@ -27,7 +29,6 @@ module.exports = {
                 embeds: [embeds.rule[page]],
                 ephemeral: true,
             });
-            console.log(`[${timenow}] 利用規約の言語を選択しました <実行ユーザー>: ${interaction.user.tag}`);
         };
         if (interaction.customId === "agreebutton") {  // 利用規約に同意した時の処理
             try {
@@ -38,15 +39,15 @@ module.exports = {
                         embeds: [embeds.completed],
                         ephemeral: true,
                     });
-                    console.log(`[${timenow}] 利用規約に同意しました <実行ユーザー/ID>: ${interaction.user.tag}/${interaction.user.id}`);
-                    appendFile("logs/rule.log", `[${timenow}] 利用規約に同意しました <実行ユーザー/ID>: ${interaction.user.tag}/${interaction.user.id}\n`);
+                    logger.info(`利用規約に同意しました <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}`);
+                    appendFile("logs/rule.log", `[${date}] 利用規約に同意しました <実行ユーザー/ID>: <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
                 } else {
                     await interaction.reply({
                         embeds: [embeds.authenticated],
                         ephemeral: true,
                     });
-                    console.log(`[${timenow}] 利用規約に同意済みです <実行ユーザー>: ${interaction.user.tag}`)
-                }
+                    logger.info(`利用規約に同意済みです <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}`);
+                };
             } catch (error) {
                 console.log(error);
             };

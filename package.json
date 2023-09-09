@@ -1,8 +1,11 @@
 {
   "dependencies": {
+    "@types/log4js": "^2.3.5",
     "discord.js": "^14.12.1",
     "dotenv": "^16.3.1",
-    "node-cron": "^3.0.2"
+    "log4j": "^1.0.0",
+    "node-cron": "^3.0.2",
+    "pm2": "^5.3.0"
   },
   "devDependencies": {
     "@types/node-cron": "^3.0.8",
@@ -17,6 +20,7 @@
   "scripts": {
     "test": "ts-node src/index.ts",
     "deploy": "node dist/deploy.js",
+    "prod": "pm2 start dist/index.js --name Kokone --namespace DiscordBOT",
     "start": "node dist/index.js",
     "compile": "tsc -p .",
     "lint:prettier": "prettier --check src",

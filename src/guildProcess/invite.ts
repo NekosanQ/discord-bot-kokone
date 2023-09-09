@@ -1,7 +1,7 @@
 import { Collection, EmbedBuilder, GuildMember, Message, PermissionsBitField, Role } from "discord.js";
 import { setTimeout } from 'node:timers/promises';
 
-const inviteChannelId: string = "1066228030114123806";
+const inviteChannelId: string = "1066228030114123806"; // 募集チャンネル
 const inviteRoleId: string[] = [
     // 通話募集通知
     "1117382182512627793", // 雑談募集
@@ -16,11 +16,11 @@ const inviteRoleId: string[] = [
     "1115553228944314388", // 原神募集
     "1115553388181069924",  // その他ゲーム募集
 ];
-const checkmarkId: string = "1033764709305962506";
+const checkmarkId: string = "1033764709305962506"; // チェックマークの絵文字のID
+// -----------------------------------------------------------------------------------------------------------
+// 荒らし対策システム
+// -----------------------------------------------------------------------------------------------------------
 module.exports = {
-    // -----------------------------------------------------------------------------------------------------------
-    // 荒らし対策システム
-    // -----------------------------------------------------------------------------------------------------------
     async execute(message: Message): Promise<void> {
         class DefaultEmbeds {
             title: string;
@@ -39,65 +39,70 @@ module.exports = {
             };
         };
         const timeoutEmbed = new DefaultEmbeds("タイムアウトされました");
-        const member: GuildMember | undefined = message.guild?.members.cache.get(message.author.id);
+        const member: GuildMember | undefined = message.guild?.members.cache.get(message.author.id); 
         // -----------------------------------------------------------------------------------------------------------
         // 募集チャンネルで、通話募集通知以外でのメンションをした場合の処理
         // -----------------------------------------------------------------------------------------------------------
         const messageRole: Collection<string, Role> = message.mentions.roles; // メッセージに含まれているメンションを取得
         if (message.channel.id == inviteChannelId && message.content.match("@")) {
-            let inviteMentionCount: number = 0; // 募集通知カウント
-            for (let key of messageRole.keys()) { // メンションの数だけ繰り返す
-                for (let n = 0; n < inviteRoleId.length; n++) { // 募集通知のロールがあるか確認
-                    if (key == inviteRoleId[n]) { // 募集通知のロールがあった場合の処理
-                        inviteMentionCount++; // 募集通知カウントを増やす
+            try {
+                let inviteMentionCount: number = 0; // 募集通知カウント
+                for (let key of messageRole.keys()) { // メンションの数だけ繰り返す
+                    for (let n = 0; n < inviteRoleId.length; n++) { // 募集通知のロールがあるか確認
+                        if (key == inviteRoleId[n]) { // 募集通知のロールがあった場合の処理
+                            inviteMentionCount++; // 募集通知カウントを増やす
+                        };
                     };
                 };
-            };
-            if (inviteMentionCount == messageRole.size) { // 募集通知のロールのみメンションされていた場合の処理
-                await message.react(message.guild?.emojis.cache.get(checkmarkId) ?? "");
-            } else { // 募集通知以外のメンションがあった場合の処理
-                const inviteNotMentionMessage: Message = await message.channel.send({
-                    embeds: [
-                        timeoutEmbed.output().setDescription("募集通知以外でのメンションが検出されました")
-                    ]
-                });
-                if (!member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
-                    await message.member?.timeout(5 * 1000);
-                };
-                await message.delete();
-                await setTimeout(3000);
-                await inviteNotMentionMessage.delete();
-            };     
+                if (inviteMentionCount == messageRole.size) { // 募集通知のロールのみメンションされていた場合の処理
+                    await message.react(message.guild?.emojis.cache.get(checkmarkId) ?? "");
+                } else { // 募集通知以外のメンションがあった場合の処理
+                    const inviteNotMentionMessage: Message = await message.channel.send({
+                        embeds: [
+                            timeoutEmbed.output().setDescription("募集通知以外でのメンションが検出されました")
+                        ]
+                    });
+                    if (!member?.permissions.has(PermissionsBitField.Flags.Administrator)) { // 管理者はタイムアウトしない
+                        await message.member?.timeout(60 * 60 * 1000);
+                    };
+                    await message.delete();
+                    await setTimeout(10000);
+                    await inviteNotMentionMessage.delete();
+                };  
+            } catch {}
         };
         // ------------------------------------------------------------------------------------------------------------
         // 全体メンションをした場合の処理
         // 対象: @everone / @here
         // -----------------------------------------------------------------------------------------------------------
         if (message.mentions.everyone) {
-            const MentionMessage: Message = await message.channel.send({
-                embeds: [
-                    timeoutEmbed.output().setDescription("処罰理由: 全体メンションの送信")
-                ]
-            });
-            if (!member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
-                await message.member?.timeout(24 * 60 * 60 * 1000);
-            }
-            await message.delete();
-            await setTimeout(3000);
-            await MentionMessage.delete();
-            
+            try {
+                const MentionMessage: Message = await message.channel.send({
+                    embeds: [
+                        timeoutEmbed.output().setDescription("処罰理由: 全体メンションの送信")
+                    ]
+                });
+                if (!member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
+                    await message.member?.timeout(24 * 60 * 60 * 1000);
+                }
+                await message.delete();
+                await setTimeout(10000);
+                await MentionMessage.delete();
+            } catch {}
         };
         // -----------------------------------------------------------------------------------------------------------
         // 個人メンションが３つ以上送信された場合の処理
         // -----------------------------------------------------------------------------------------------------------
         if (message.mentions.members != null&&message.mentions.members.size >= 3) {
-            await message.delete(); 
-            await message.member?.timeout(60 * 60 * 1000);
-            await message.channel.send({
-                embeds: [
-                    timeoutEmbed.output().setDescription("処罰理由: 複数の個人メンションの送信")
-                ]
-            })
+            try {
+                await message.delete(); 
+                await message.member?.timeout(60 * 60 * 1000);
+                await message.channel.send({
+                    embeds: [
+                        timeoutEmbed.output().setDescription("処罰理由: 複数の個人メンションの送信")
+                    ]
+                });
+            } catch {}
         };
     }
 };

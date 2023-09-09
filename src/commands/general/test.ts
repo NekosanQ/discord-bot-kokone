@@ -1,4 +1,7 @@
 import { CommandInteraction, SlashCommandBuilder, } from "discord.js";
+// -----------------------------------------------------------------------------------------------------------
+// interactionの
+// -----------------------------------------------------------------------------------------------------------
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("test")
