@@ -1,4 +1,4 @@
-import { Interaction, SlashCommandBuilder, StringSelectMenuInteraction } from "discord.js";
+import { Interaction, PermissionsBitField, SlashCommandBuilder, StringSelectMenuInteraction } from "discord.js";
 import { languageMenu, embeds, agreeButton } from "../../module/ruledata";
 import { appendFile } from "../../module/file/appedFile";
 import log4js from 'log4js';
@@ -12,7 +12,7 @@ module.exports = {
         .setDescription("利用規約を作成します"),
     async execute(interaction: Interaction<"cached">): Promise<void> {
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
-        if (interaction.isChatInputCommand()) {
+        if (interaction.isChatInputCommand()&&interaction.member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
             await interaction.reply({
                 embeds: [embeds.rule[0]],
                 components: [languageMenu, agreeButton]

@@ -22,7 +22,8 @@
     "deploy": "node dist/deploy.js",
     "prod": "pm2 start dist/index.js --name Kokone --namespace DiscordBOT",
     "start": "node dist/index.js",
-    "stop": "pm2 stop work",
+    "restart": "pm2 restart Kokone",
+    "stop": "pm2 stop Kokone",
     "compile": "tsc -p .",
     "lint:prettier": "prettier --check src",
     "fix:prettier": "prettier --write src"

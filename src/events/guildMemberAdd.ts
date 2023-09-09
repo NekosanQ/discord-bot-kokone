@@ -27,7 +27,7 @@ module.exports = {
                 .setFooter({ text: "入室日時", iconURL: member.user.avatarURL() || undefined }),
             chat: new EmbedBuilder()
                 .setTitle("新規さんが入室しました！")
-                .setDescription(`${member.displayName} has joined the server!\n${member.displayName}さんが入室しました！\n挨拶してあげてね！\nサーバー人数が${member.guild.memberCount}人になりました！`)
+                .setDescription(`<@${member.id}> has joined the server!\n${member.displayName}さんが入室しました！\n挨拶してあげてね！\nサーバー人数が${member.guild.memberCount}人になりました！`)
                 .setColor(Number(botcolor))
                 .setThumbnail(member.user.avatarURL())
                 .setTimestamp()
