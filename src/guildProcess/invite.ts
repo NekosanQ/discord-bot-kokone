@@ -75,16 +75,14 @@ module.exports = {
         // 全体メンションをした場合の処理
         // 対象: @everone / @here
         // -----------------------------------------------------------------------------------------------------------
-        if (message.mentions.everyone) {
+        if (message.mentions.everyone&&member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
             try {
                 const MentionMessage: Message = await message.channel.send({
                     embeds: [
                         timeoutEmbed.output().setDescription("処罰理由: 全体メンションの送信")
                     ]
                 });
-                if (!member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
-                    await message.member?.timeout(24 * 60 * 60 * 1000);
-                }
+                await message.member?.timeout(24 * 60 * 60 * 1000);
                 await message.delete();
                 await setTimeout(10000);
                 await MentionMessage.delete();
@@ -93,7 +91,7 @@ module.exports = {
         // -----------------------------------------------------------------------------------------------------------
         // 個人メンションが３つ以上送信された場合の処理
         // -----------------------------------------------------------------------------------------------------------
-        if (message.mentions.members != null&&message.mentions.members.size >= 3) {
+        if (message.mentions.members != null&&message.mentions.members.size >= 3&&member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
             try {
                 await message.delete(); 
                 await message.member?.timeout(60 * 60 * 1000);
