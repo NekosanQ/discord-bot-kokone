@@ -52,7 +52,6 @@ const eventFiles: string[] = fs.readdirSync(eventsPath).filter(file => file.ends
 for (const file of eventFiles) {
 	const filePath: string = path.join(eventsPath, file);
 	const event = require(filePath);
-	console.log(filePath);
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
 	} else {
@@ -60,4 +59,4 @@ for (const file of eventFiles) {
 	}
 }
 
-client.login(process.env.TOKEN)
+client.login(process.env.KokoneToken);

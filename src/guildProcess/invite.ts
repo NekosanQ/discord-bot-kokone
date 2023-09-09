@@ -21,7 +21,7 @@ module.exports = {
     // -----------------------------------------------------------------------------------------------------------
     // 荒らし対策システム
     // -----------------------------------------------------------------------------------------------------------
-    async run_message (message: Message): Promise<void> {
+    async execute(message: Message): Promise<void> {
         class DefaultEmbeds {
             title: string;
             constructor(title: string) {
@@ -32,8 +32,8 @@ module.exports = {
                     .setColor(0xb9d98b)
                     .setTitle(this.title)
                     .setFields([
-                        { name: "処罰ユーザー名", value: message.author.username },
-                        { name: "処罰ユーザーID", value: message.author.id }
+                        { name: "処罰ユーザー名", value: `${message.author.displayName}/${message.author.username}` },
+                        { name: "処罰ユーザーID", value: `${message.author.id}` }
                     ])
                 return embed;
             };

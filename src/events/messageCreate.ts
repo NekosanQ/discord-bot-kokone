@@ -6,7 +6,7 @@ import { prefix } from "../config.json";
 module.exports = {
     name: Events.MessageCreate,
     async execute(message: Message): Promise<void> {
-        console.log("メッセージを受信しました。");
-        await import("../guildProcess/invite");
+        if (message.author.bot) return;
+        await require("../guildProcess/invite").execute(message);
     }
 };
