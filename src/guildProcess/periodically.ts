@@ -13,8 +13,7 @@ module.exports = {
         if (getManagementChannelId) {
             const logsPath: string = path.join(__dirname, '../../logs');
             const logFiles: string[] = fs.readdirSync(logsPath).filter(file => file.endsWith('.log'));
-            
-            cron.schedule('0 0 0 * * *', () => { // 0時になったら実行
+            cron.schedule("0 0 0 * * *", () => { // 0時になったら実行
                 for (const file of logFiles) { // logsフォルダのlogファイルを全て取得
                     const filePath: string = path.join(logsPath, file);
                     (getManagementChannelId as TextChannel).send({
