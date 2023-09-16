@@ -9,6 +9,7 @@ module.exports = {
         if (message.author.bot) return;
 
         await require("../guildProcess/antiTroll").execute(message);
+        await require("../guildProcess/stickyMessage").execute(message);
 
         const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         const attachmentUrl = message.attachments.map(attachment => attachment.url);

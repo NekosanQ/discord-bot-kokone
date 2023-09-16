@@ -1,6 +1,6 @@
 import { Collection, EmbedBuilder, GuildMember, Message, PermissionsBitField, Role } from "discord.js";
 import { setTimeout } from 'node:timers/promises';
-
+import { appendFile } from "../module/file/appedFile";
 const inviteChannelId: string = "1066228030114123806"; // 募集チャンネル
 const inviteRoleId: string[] = [
     // 通話募集通知
@@ -38,6 +38,7 @@ module.exports = {
                 return embed;
             };
         };
+        const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         const timeoutEmbed = new DefaultEmbeds("タイムアウトされました");
         const member: GuildMember | undefined = message.guild?.members.cache.get(message.author.id); 
         // -----------------------------------------------------------------------------------------------------------
@@ -45,6 +46,15 @@ module.exports = {
         // -----------------------------------------------------------------------------------------------------------
         const messageRole: Collection<string, Role> = message.mentions.roles; // メッセージに含まれているメンションを取得
         if (message.channel.id == inviteChannelId && message.content.match("@")) {
+            const voiceChannel = message.member?.voice.channel;
+            if (!voiceChannel) {
+                const errorMessage: string = "ボイスチャンネルにいないユーザーのメンションを検出しました";
+                appendFile("logs/violation.log", `[${date}] ${errorMessage} <違反ユーザー/ID>: <違反ユーザー表示名/名前/ID>: ${message.author.displayName}/${message.author.username}/${message.author.id}\n`);
+                const errorMessageSend: Message = await message.channel.send(`${errorMessage}`);
+                await message.delete();
+                await setTimeout(10000);
+                await errorMessageSend.delete();
+            }
             try {
                 let inviteMentionCount: number = 0; // 募集通知カウント
                 for (let key of messageRole.keys()) { // メンションの数だけ繰り返す
@@ -57,9 +67,11 @@ module.exports = {
                 if (inviteMentionCount == messageRole.size) { // 募集通知のロールのみメンションされていた場合の処理
                     await message.react(message.guild?.emojis.cache.get(checkmarkId) ?? "");
                 } else { // 募集通知以外のメンションがあった場合の処理
-                    const inviteNotMentionMessage: Message = await message.channel.send({
+                    const errorMessage: string = "募集通知以外でのメンションを検出しました";
+                    appendFile("logs/violation.log", `[${date}] ${errorMessage} <違反ユーザー/ID>: <違反ユーザー表示名/名前/ID>: ${message.author.displayName}/${message.author.username}/${message.author.id}\n`);
+                    const errorMessageSend: Message = await message.channel.send({
                         embeds: [
-                            timeoutEmbed.output().setDescription("募集通知以外でのメンションが検出されました")
+                            timeoutEmbed.output().setDescription(`${errorMessage}`)
                         ]
                     });
                     if (!member?.permissions.has(PermissionsBitField.Flags.Administrator)) { // 管理者はタイムアウトしない
@@ -67,7 +79,7 @@ module.exports = {
                     };
                     await message.delete();
                     await setTimeout(10000);
-                    await inviteNotMentionMessage.delete();
+                    await errorMessageSend.delete();
                 };  
             } catch {}
         };
