@@ -1,14 +1,12 @@
-import { Events, TextChannel, VoiceState, } from "discord.js";
+import { Events, VoiceState, } from "discord.js";
 import { appendFile } from '../module/file/appedFile';
 // -----------------------------------------------------------------------------------------------------------
-// メッセージ処理
+// ボイスチャンネル処理
 // -----------------------------------------------------------------------------------------------------------
 module.exports = {
     name: Events.VoiceStateUpdate,
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
         const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
-        // ログチャンネルを取得
-        const logChannel = newState.client.channels.cache.get("993406780262592532");
 
         // ユーザー名とボイスチャンネル名を取得
         const newMember = newState.member;
@@ -44,7 +42,7 @@ module.exports = {
             // 新しいチャンネルがないなら退出したと判定
             logMessage += "退出しました";
         };
-        logMessage += ` <ユーザー表示名/ID> ${userName} <チャンネル名/ID> ${voiceChannelName}`;
+        logMessage += ` <ユーザー表示名/ID> ${userName} <チャンネル名/ID> ${voiceChannelName}\n`;
         appendFile("logs/voice.log", logMessage);
     }
 };
