@@ -12,7 +12,7 @@ module.exports = {
 
         const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         const attachmentUrl = message.attachments.map(attachment => attachment.url);
-        console.log(message.channel);
+        
         appendFile("logs/message.log", `[${date}] ${message.author.displayName}/${message.author.id} ${attachmentUrl}\n`);
         appendFile("logs/message.log", `${message.content}\n`);
     }
