@@ -8,7 +8,7 @@ module.exports = {
     async execute(message: Message): Promise<void> {
         if (message.author.bot) return;
 
-        await require("../guildProcess/invite").execute(message);
+        await require("../guildProcess/antiTroll").execute(message);
 
         const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         const attachmentUrl = message.attachments.map(attachment => attachment.url);
