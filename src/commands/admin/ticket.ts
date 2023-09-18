@@ -109,7 +109,7 @@ module.exports = {
                                     appendFile("logs/error.log", `[${date}] ${error}`);
                                 });
                             }
-                        }, 5000);
+                        }, 1000 * 60 * 60);
                     } else {
                         console.log("作成したチケットチャンネルにメッセージを送信できませんでした")
                     };
