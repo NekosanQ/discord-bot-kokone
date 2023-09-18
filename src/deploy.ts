@@ -30,7 +30,7 @@ for (const folder of commandFolders) {
 }
 
 // RESTモジュールのインスタンスを構築
-const rest = new REST().setToken(process.env.TOKEN || "");
+const rest = new REST().setToken(process.env.KokoneToken || "");
 
 // コマンドをデプロイ
 (async () => {

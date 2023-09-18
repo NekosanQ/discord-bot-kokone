@@ -1,4 +1,4 @@
-import { Collection, EmbedBuilder, GuildMember, Message, PermissionsBitField, Role } from "discord.js";
+import { Collection, EmbedBuilder, GuildMember, Message, PermissionsBitField, Role, TextChannel } from "discord.js";
 import { setTimeout } from 'node:timers/promises';
 import { appendFile } from "../module/file/appedFile";
 const inviteChannelId: string = "1066228030114123806"; // 募集チャンネル
@@ -81,7 +81,9 @@ module.exports = {
                     await setTimeout(10000);
                     await errorMessageSend.delete();
                 };  
-            } catch {}
+            } catch (error) {
+                appendFile("logs/error.log", `[${date}] ${error}`);
+            };
         };
         // ------------------------------------------------------------------------------------------------------------
         // 全体メンションをした場合の処理
@@ -98,7 +100,9 @@ module.exports = {
                 await message.delete();
                 await setTimeout(10000);
                 await MentionMessage.delete();
-            } catch {}
+            } catch (error) {
+                appendFile("logs/error.log", `[${date}] ${error}`);
+            };
         };
         // -----------------------------------------------------------------------------------------------------------
         // 個人メンションが３つ以上送信された場合の処理
@@ -112,7 +116,24 @@ module.exports = {
                         timeoutEmbed.output().setDescription("処罰理由: 複数の個人メンションの送信")
                     ]
                 });
-            } catch {}
+            } catch (error) {
+                appendFile("logs/error.log", `[${date}] ${error}`);
+            };
+        };
+        // -----------------------------------------------------------------------------------------------------------
+        // チケットチャンネルでメッセージが送信されたらログに保存する処理
+        // -----------------------------------------------------------------------------------------------------------
+        const channel = message.channel;
+        if (channel.type === 0) {
+            try {
+                const ticketCateforyId = "1153219622036848660";
+                const messageCategoryId = channel.parent?.id;
+                if (messageCategoryId === ticketCateforyId) {
+                    appendFile("logs/ticket.log", `[${date}] <${message.author.displayName}/${message.author.id}> <${channel.name}/${channel.id}>\n${message.content}\n`);
+                };
+            } catch (error) {
+                appendFile("logs/error.log", `[${date}] ${error}`);
+            }
         };
     }
 };

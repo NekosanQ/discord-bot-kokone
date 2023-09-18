@@ -49,7 +49,7 @@ module.exports = {
                     logger.info(`利用規約に同意済みです <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}`);
                 };
             } catch (error) {
-                console.log(error);
+                appendFile("logs/error.log", `[${date}] ${error}`);
             };
         };
     }

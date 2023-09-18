@@ -7,7 +7,6 @@ module.exports = {
     name: Events.MessageCreate,
     async execute(message: Message): Promise<void> {
         if (message.author.bot) return;
-
         await require("../guildProcess/antiTroll").execute(message);
         await require("../guildProcess/stickyMessage").execute(message);
 

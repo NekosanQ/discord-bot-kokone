@@ -14,6 +14,8 @@ module.exports = {
 			commandName = interaction.message.interaction.commandName;
 		} else if (interaction.isButton()&&interaction.message.interaction != null) {
 			commandName = interaction.message.interaction.commandName;
+		} else if (interaction.isStringSelectMenu() || interaction.isButton()) {
+			commandName = interaction.customId.split("_")[1];
 		} else {
 			commandName = ""
 		}
