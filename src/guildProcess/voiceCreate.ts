@@ -1,9 +1,10 @@
 import { ActionRowBuilder, EmbedBuilder, PermissionsBitField, RoleSelectMenuBuilder, StringSelectMenuBuilder, UserSelectMenuBuilder, VoiceState } from "discord.js";
 import { botcolor } from "../config.json";
 
-const voiceChannelId: string = "1153634422583730176";
-const memberRoleId: string = "712572415850315807";
+const voiceChannelId: string = "1153634422583730176"; // ボイスチャンネルID 
+const memberRoleId: string = "712572415850315807";    // メンバーロールID
 
+// デフォルトであるボイスチャンネル
 const defaultChannelList: string[] = [
     "1153634422583730176", // 自動作成
     "1043089821947678720", // 作業1
@@ -43,39 +44,44 @@ const denyUserPermisson: bigint[] = [
     PermissionsBitField.Flags.AttachFiles,            // ファイルを添付
 ];
 
+// ボイスチャンネルを作成時に送る埋め込みメッセージ
 const createChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(botcolor))
     .setTitle("ボイスチャンネルを作成しました。")
     .setDescription("二段階認証をしている場合、チャンネルの設定やボイスチャットメンバーへのミュートなどが行えます。\n二段階認証していない場合、BOTからチャンネルの設定を行って下さい。\n※このチャンネルは、誰もいない状態が30秒以上続くと自動的にチャンネルが消えます。\n※引き継がれるのはブロックしているユーザー・ロールのみです。チャンネル名などは引き継がれません。")
-
+// ブロックするユーザーを選択するためのセレクトメニュー
 const userBlackListMenu: ActionRowBuilder<UserSelectMenuBuilder> = new ActionRowBuilder<UserSelectMenuBuilder>().setComponents(
     new UserSelectMenuBuilder()
         .setCustomId("user_blacklist")
         .setPlaceholder("ブロックするユーザーを選択")
         .setMaxValues(5)
         .setMinValues(1)
-)
+);
+// ブロックしているユーザーを解除選択するためのセレクトメニュー
 const userBlackReleaseListMenu: ActionRowBuilder<UserSelectMenuBuilder> = new ActionRowBuilder<UserSelectMenuBuilder>().setComponents(
     new UserSelectMenuBuilder()
         .setCustomId("user_blackreleaselist")
         .setPlaceholder("ブロックを解除するユーザーを選択")
         .setMaxValues(5)
         .setMinValues(1)
-)
+);
+// ブロックするロールを選択するためのセレクトメニュー
 const roleBlackListMenu: ActionRowBuilder<RoleSelectMenuBuilder> = new ActionRowBuilder<RoleSelectMenuBuilder>().setComponents(
     new RoleSelectMenuBuilder()
         .setCustomId("role_blacklist")
         .setPlaceholder("ブロックするロールを選択")
         .setMaxValues(5)
         .setMinValues(1)
-)
+);
+// ブロックするロールを解除選択するためのセレクトメニュー
 const roleBlackReleaseListMenu: ActionRowBuilder<RoleSelectMenuBuilder> = new ActionRowBuilder<RoleSelectMenuBuilder>().setComponents(
     new RoleSelectMenuBuilder()
         .setCustomId("role_blackreleaselist")
         .setPlaceholder("ブロックを解除するロールを選択")
         .setMaxValues(5)
         .setMinValues(1)
-)
+);
+// 設定を選択するためのセレクトメニュー
 const operationMenu: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
     new StringSelectMenuBuilder()
         .setCustomId("operationMenu")
@@ -104,7 +110,7 @@ const operationMenu: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBu
                 value: "confirmation_setting"
             }
         )
-)
+);
 // -----------------------------------------------------------------------------------------------------------
 // ボイスチャンネル作成機能
 // VC作成チャンネルにアクセス -> VC作成(権限管理) -> VC移動 
@@ -117,16 +123,14 @@ module.exports = {
         const oldMember = oldState.member;
         const userName = newMember ? `${newState.member?.user.displayName}` : oldMember ? `${oldState.member?.user.displayName}` : "unknown user";
         const userId = newMember ? `${newState.member?.user.id}` : oldMember ? `${oldState.member?.user.id}` : "";
-        const defaultChannelName = `自動作成-${userName}`;
+        const defaultChannelName = `自動作成-${userName}`; // デフォルトのチャンネル名
         const deleteMap = new Map();
         // -----------------------------------------------------------------------------------------------------------
         // VC作成チャンネルに入った場合の処理
         // -----------------------------------------------------------------------------------------------------------
         if (oldState.channelId !== voiceChannelId && newState.channelId === voiceChannelId) {
-            // 特定のボイスチャンネルを取得
-            const voiceChannel = newState.channel;
-            // 特定のボイスチャンネルと同じカテゴリーに新しいボイスチャンネルを作成
-            voiceChannel?.clone({
+            const voiceChannel = newState.channel; // 特定のボイスチャンネルを取得
+            voiceChannel?.clone({ // 特定のボイスチャンネルと同じカテゴリーに新しいボイスチャンネルを作成
                 name: defaultChannelName,
                 permissionOverwrites: [
                     {
@@ -139,25 +143,21 @@ module.exports = {
                     }
                 ]
             })
-            .then((newVoiceChannel) => {
-                // 新しいボイスチャンネルに移動する
-                newState.setChannel(newVoiceChannel)
+            .then((newVoiceChannel) => { 
+                newState.setChannel(newVoiceChannel) // 作成したボイスチャンネルに移動
                 .then(() => {
-                    // 成功したらメッセージを送信する
-                    newVoiceChannel.send({
+                    newVoiceChannel.send({ // 移動が成功したらメッセージを送信
                         content: `<@${userId}>`,
                         embeds: [createChannelEmbed],
                         components: [userBlackListMenu, userBlackReleaseListMenu, roleBlackListMenu, roleBlackReleaseListMenu, operationMenu]
                     });
                 })
                 .catch((error: Error) => {
-                    // 失敗したらエラーを表示する
                     console.error(error);
                     newVoiceChannel.send('移動に失敗しました');
                 });
             })
             .catch((error: Error) => {
-                // 失敗したらエラーを表示する
                 console.error(error);
             });
         };
@@ -166,18 +166,15 @@ module.exports = {
         // -----------------------------------------------------------------------------------------------------------
         if (oldState.channelId && oldState.channelId !== newState.channelId) { 
             try {
-                for (let i = 0; i < defaultChannelList.length; i++) {
+                for (let i = 0; i < defaultChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
                     if (defaultChannelList[i] === oldState.channelId) return;
                 };
-                // チャンネルに誰もいない場合
-                if (oldState.channel?.members.size === 0) {
-                    // 30秒後に削除する予約を作成
-                    const timeout = setTimeout(() => {
+                if (oldState.channel?.members.size === 0) { // チャンネルに誰もいない場合
+                    const timeout = setTimeout(() => { // 30秒後に削除する予約を作成
                         oldState.channel?.delete();
                         deleteMap.delete(oldState.channel?.id);
                     }, 30 * 1000);
-                    // マップに予約を保存
-                    deleteMap.set(oldState.channel.id, timeout);
+                    deleteMap.set(oldState.channel.id, timeout); // マップに予約を保存
                 };
             } catch {}
         };
@@ -186,13 +183,11 @@ module.exports = {
         // -----------------------------------------------------------------------------------------------------------
         if (newState.channelId && newState.channelId !== oldState.channelId) {
             try {
-                for (let i = 0; i < defaultChannelList.length; i++) {
+                for (let i = 0; i < defaultChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
                     if (defaultChannelList[i] === newState.channelId) return;
                 };
-                // マップに予約がある場合
-                if (deleteMap.has(newState.channel?.id)) {
-                    // 予約をキャンセル
-                    clearTimeout(deleteMap.get(newState.channel?.id));
+                if (deleteMap.has(newState.channel?.id)) { // マップに予約がある場合
+                    clearTimeout(deleteMap.get(newState.channel?.id)); // 予約をキャンセル
                     deleteMap.delete(newState.channel?.id);
                 };
             } catch {}
