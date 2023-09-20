@@ -6,6 +6,7 @@ import { appendFile } from '../module/file/appedFile';
 module.exports = {
     name: Events.VoiceStateUpdate,
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
+        await require("../guildProcess/voiceCreate").execute(oldState, newState);
         const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         try {
             // ユーザー名とボイスチャンネル名を取得

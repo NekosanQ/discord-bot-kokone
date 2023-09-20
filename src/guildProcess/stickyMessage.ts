@@ -19,7 +19,7 @@ module.exports = {
                 const fetchedMessages = await message.channel.messages.fetch();
                 const stickyMessage = fetchedMessages.find(message => message.author.id === message.client.user.id && inviteChannelId.includes(message.channel.id));
 
-                if(stickyMessage) {
+                if (stickyMessage) {
                     stickyMessage.delete().then(() => {
                         message.channel.send({
                             embeds: [inviteStickyMessage]
