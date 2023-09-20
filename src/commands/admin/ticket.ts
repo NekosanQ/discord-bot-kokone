@@ -34,7 +34,7 @@ const deleteButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<Butto
         .setStyle(ButtonStyle.Danger)
 )
 // -----------------------------------------------------------------------------------------------------------
-// チケット
+// チケット機能
 // -----------------------------------------------------------------------------------------------------------
 module.exports = {
     data: new SlashCommandBuilder()

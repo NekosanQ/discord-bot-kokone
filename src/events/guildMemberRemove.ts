@@ -22,7 +22,7 @@ module.exports = {
 
         logger.info(`[退室通知] <入室ユーザー表示名/名前/ID>: ${member.displayName}/${member.user.username}/${member.id}`);
         
-        if (getEntranceChannelId) {
+        if (getEntranceChannelId) { // 入退室チャンネルに送信
             await (getEntranceChannelId as TextChannel).send({
                 embeds: [removeMessageEmbed]
             });

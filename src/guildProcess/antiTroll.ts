@@ -43,6 +43,7 @@ module.exports = {
         const member: GuildMember | undefined = message.guild?.members.cache.get(message.author.id); 
         // -----------------------------------------------------------------------------------------------------------
         // 募集チャンネルで、通話募集通知以外でのメンションをした場合の処理
+        // (ユーザーへのメンションは処理しない)
         // -----------------------------------------------------------------------------------------------------------
         const messageRole: Collection<string, Role> = message.mentions.roles; // メッセージに含まれているメンションを取得
         if (message.channel.id == inviteChannelId && message.content.match("@")) {
