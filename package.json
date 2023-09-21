@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@discordjs/builders": "^1.6.5",
     "@prisma/client": "^5.3.1",
     "@types/log4js": "^2.3.5",
     "discord.js": "^14.12.1",

@@ -20,15 +20,19 @@ module.exports = {
 			commandName = ""
 		}
 		const command: CustomCommand | undefined = interaction.client.commands.get(commandName);
-		if (!command) {
-			console.error(`[ERROR] コマンドが見つかりませんでした: ${commandName}`);
-			return;
-		};
-		try {
-			await command.execute(interaction);
-		} catch (error) {
-			console.error(`[ERROR] 実行エラー: ${commandName}`);
-			console.error(error);
-		};
+		if (command) {
+			try {
+				await command.execute(interaction);
+			} catch (error) {
+				console.error(`[ERROR] 実行エラー: ${commandName}`);
+				console.error(error);
+			};
+		} else if (!command) {
+			try {
+				await require("../events/interactionDiscrimination").execute(interaction);
+			} catch (error) {
+				console.log(error);
+			}
+		}
 	},
 };
