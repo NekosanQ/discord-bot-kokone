@@ -14,13 +14,13 @@ const allowPermisson: bigint[] = [
 
 const ticketEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(botcolor))
-    .setTitle("チケット作成")
-    .setDescription("お問い合わせフォーラムで投稿出来ない問題などを、運営と直接話したい場合に使用してください。\n__運営などへ連絡する際、DMやメンションなどはせず、必ずチケットを作成して連絡を取ってください。__")
-    .setFields({ name: "注意", value: "・チケットを作成して一時間経ってもメッセージを送らない場合は自動的にチャンネルが削除されます\n・チケットは複数作成出来ません\n・世間話などの目的で使用するのは禁止です"})
+    .setTitle("お問い合わせ")
+    .setDescription("お問い合わせフォーラムで投稿出来ない問題などを、運営と直接話したい場合に使用してください。\n__運営などへ連絡する際、DMやメンションなどはせず、必ずお問い合わせを作成して連絡を取ってください。__")
+    .setFields({ name: "注意", value: "・お問い合わせを作成して一時間経ってもメッセージを送らない場合は自動的にチャンネルが削除されます\n・お問い合わせは複数作成出来ません\n・世間話などの目的で使用するのは禁止です"})
 const ticketButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId("ticketbutton")
-        .setLabel("📩チケットを作成する")
+        .setLabel("📩お問い合わせを開始する")
         .setStyle(ButtonStyle.Success)
 )
 const channelCreateEmbed: EmbedBuilder = new EmbedBuilder()
@@ -30,16 +30,16 @@ const channelCreateEmbed: EmbedBuilder = new EmbedBuilder()
 const deleteButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId("deletebutton_ticket")
-        .setLabel("チケットチャンネルを削除する")
+        .setLabel("チャンネルを削除する")
         .setStyle(ButtonStyle.Danger)
 )
 // -----------------------------------------------------------------------------------------------------------
-// チケット機能
+// お問い合わせ作成
 // -----------------------------------------------------------------------------------------------------------
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("ticket")
-        .setDescription("チケットを作成します"),
+        .setDescription("お問い合わせを作成します"),
     async execute(interaction: Interaction<"cached">): Promise<void> {
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         if (interaction.isChatInputCommand()&&interaction.member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
@@ -50,21 +50,21 @@ module.exports = {
             return;
         };
         // -----------------------------------------------------------------------------------------------------------
-        // チケットを作成した時の処理
+        // お問い合わせを作成した時の処理
         // -----------------------------------------------------------------------------------------------------------
         if (!interaction.isButton()) return;
         if (interaction.customId === "ticketbutton") {
-            const ticketChannelName = `チケット-${interaction.user.id}`;
+            const ticketChannelName = `お問い合わせ-${interaction.user.id}`;
             const channel: Channel | undefined = interaction.client.channels.cache.find((channel: Channel) => (channel as WidgetChannel).name === ticketChannelName);
             const operationRoleId = "970250087089438740";
             if (channel) {
                 interaction.reply({
-                    content: "既にあなたはチケットを作成しています",
+                    content: "既にあなたはお問い合わせを作成しています",
                     ephemeral: true
                 })
             } else {
-                if (interaction.customId === "ticketbutton") { // チケット時の処理
-                    appendFile("logs/ticket.log", `[${date}] チケットを作成しました <実行ユーザー/ID>: <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
+                if (interaction.customId === "ticketbutton") { // お問い合わせ時の処理
+                    appendFile("logs/ticket.log", `[${date}] お問い合わせを作成しました <実行ユーザー/ID>: <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
                     await interaction.guild.channels.create({
                         name: ticketChannelName,
                         parent: "1153219622036848660",
@@ -111,7 +111,7 @@ module.exports = {
                             }
                         }, 1000 * 60 * 60);
                     } else {
-                        console.log("作成したチケットチャンネルにメッセージを送信できませんでした")
+                        console.log("作成したお問い合わせチャンネルにメッセージを送信できませんでした")
                     };
                 }
             };
@@ -120,7 +120,7 @@ module.exports = {
             const channelId: string | undefined = interaction.channel?.id;
             if(channelId) {
                 try {
-                    appendFile("logs/ticket.log", `[${date}] チケットを削除しました <実行ユーザー/ID>: <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
+                    appendFile("logs/ticket.log", `[${date}] お問い合わせを削除しました <実行ユーザー/ID>: <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
                     interaction.client.channels.cache.get(channelId)?.delete();
                 } catch (error) {
                     appendFile("logs/error.log", `[${date}] ${error}`);

@@ -6,17 +6,18 @@ import {
     operationMenu, 
     publicButton, 
     voiceChannelId,
-    memberRoleId,
+    authenticatedRoleId,
+    everyoneRoleId,
     allowUserPermisson, 
     denyUserPermisson, 
     allowCreateUserPermisson, 
 } from "../module/voiceCreateData";
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
 
-
+const prisma = new PrismaClient();
 // デフォルトであるボイスチャンネル
 const defaultChannelList: string[] = [
-    "1153634422583730176", // 自動作成
+    "1161720349587669073", // 自動作成
     "1043089821947678720", // 作業1
     "1117728041532137494", // 作業2
     "993406228346707988",  // ゲーム1
@@ -34,7 +35,6 @@ const defaultChannelList: string[] = [
 // -----------------------------------------------------------------------------------------------------------
 module.exports = {  
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
-        const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         const newMember = newState.member;
         const oldMember = oldState.member;
         const userName = newMember ? `${newState.member?.user.displayName}` : oldMember ? `${oldState.member?.user.displayName}` : "unknown user";
@@ -54,26 +54,43 @@ module.exports = {
                         allow: [allowCreateUserPermisson, allowUserPermisson]
                     },
                     {
-                        id: memberRoleId,
+                        id: authenticatedRoleId,
+                        deny: [denyUserPermisson]
+                    },
+                    {
+                        id: everyoneRoleId,
                         deny: [denyUserPermisson]
                     }
                 ]
             })
             .then((newVoiceChannel) => { 
                 newState.setChannel(newVoiceChannel) // 作成したボイスチャンネルに移動
-                .then(() => {
+                .then(async () => {
                     const channelName: string | undefined = newState.channel?.name;
                     let channelUserLimit: number | string | undefined = newState.channel?.userLimit;
                     if (channelUserLimit === 0) {
                         channelUserLimit = "無制限";
+                    } else {
+                        channelUserLimit = `${channelUserLimit}人`
                     }
                     const channelBitRate = Number(newState.channel?.bitrate) / 1000;
+                    let blockUserList = "なし";
+
+                    const allUsers = await prisma.blackLists.findMany({
+                        where: {
+                            user_id: String(newMember?.id)
+                        },
+                    })
+                    for (let i = 0; i < allUsers.length; i++) {
+                        if (blockUserList == "なし") blockUserList = "";
+                        blockUserList += `<@${String(allUsers[i].block_user_id)}>\n`;
+                    };
                     newVoiceChannel.send({ // 移動が成功したらメッセージを送信
                         content: `<@${userId}>`,
                         embeds: [createChannelEmbed
                             .setFields(
-                                { name: "現在の設定", value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}人\nビットレート: ${channelBitRate}kbps`},
-                                { name: "ブロックしているユーザー", value: "・<@635905351526514699>\n・<@655572647777796097>"}
+                                { name: "現在の設定", value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitRate}kbps`},
+                                { name: "ブロックしているユーザー", value: blockUserList}
                             )
                         ],
                         components: [userBlackListMenu, userBlackReleaseListMenu, operationMenu, publicButton]
@@ -103,7 +120,9 @@ module.exports = {
                     }, 30 * 1000);
                     deleteMap.set(oldState.channel.id, timeout); // マップに予約を保存
                 };
-            } catch {}
+            } catch (error) {
+                console.log(error);
+            };
         };
         // -----------------------------------------------------------------------------------------------------------
         // VCに入り直した場合、チャンネルを削除する予約をキャンセルする処理
@@ -117,7 +136,9 @@ module.exports = {
                     clearTimeout(deleteMap.get(newState.channel?.id)); // 予約をキャンセル
                     deleteMap.delete(newState.channel?.id);
                 };
-            } catch {}
+            } catch (error) {
+                console.log(error);
+            };
         };
     },
 };

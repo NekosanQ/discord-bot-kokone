@@ -59,9 +59,9 @@ export const publicButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilde
             .setLabel("ボイスチャンネルを公開する")
             .setStyle(ButtonStyle.Success)
     )
-
-export const voiceChannelId: string = "1153634422583730176"; // ボイスチャンネルID 
-export const memberRoleId: string = "712572415850315807";    // メンバーロールID
+export const voiceChannelId: string = "1161720349587669073"; // ボイスチャンネルID 
+export const authenticatedRoleId: string = "1180443305947955280"; // 認証ロールID
+export const everyoneRoleId: string = "685035498699620377"; // everyoneロールID
 
 // ボイスチャンネルを使用するユーザーの権限
 export const allowUserPermisson: bigint[] = [
@@ -76,6 +76,10 @@ export const allowUserPermisson: bigint[] = [
     PermissionsBitField.Flags.UseExternalSounds,      // 外部のサウンドボードの使用
     PermissionsBitField.Flags.UseSoundboard,          // サウンドボードの使用
     PermissionsBitField.Flags.UseApplicationCommands, // アプリケーションコマンドの使用
+    PermissionsBitField.Flags.Connect,                // 接続
+    PermissionsBitField.Flags.Speak,                  // 発言
+    PermissionsBitField.Flags.Stream,                 // 配信
+    PermissionsBitField.Flags.UseVAD                  // 音声検出を使用
 ];
 // ボイスチャンネルを作成したユーザーの追加管理権限
 export const allowCreateUserPermisson: bigint[] = [
@@ -83,10 +87,11 @@ export const allowCreateUserPermisson: bigint[] = [
     PermissionsBitField.Flags.DeafenMembers,          // メンバーをスピーカーミュート
     PermissionsBitField.Flags.ManageMessages,         // メッセージの管理
     PermissionsBitField.Flags.ManageChannels,         // チャンネルの管理
+    PermissionsBitField.Flags.Connect,                // 接続
+    PermissionsBitField.Flags.Speak,                  // 発言
+    PermissionsBitField.Flags.UseVAD                  // 音声検出を使用
 ];
 // ボイスチャンネルを使用させなくさせる為の権限
 export const denyUserPermisson: bigint[] = [
     PermissionsBitField.Flags.ViewChannel,            // チャンネルを見る
-    PermissionsBitField.Flags.SendMessages,           // メッセージを送信
-    PermissionsBitField.Flags.AttachFiles,            // ファイルを添付
 ];
