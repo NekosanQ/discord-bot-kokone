@@ -3,6 +3,7 @@ import { entranceChannelId, chatChannelId, botcolor } from '../config.json';
 import log4js from 'log4js';
 const logger = log4js.getLogger();
 logger.level = "info";
+const uncertifiedRole: string = "712572415850315807";
 // -----------------------------------------------------------------------------------------------------------
 // 入室通知
 // -----------------------------------------------------------------------------------------------------------
@@ -35,6 +36,8 @@ module.exports = {
         };
 
         logger.info(`[入室通知] <入室ユーザー表示名/名前/ID>: ${member.displayName}/${member.user.username}/${member.id}`);
+
+        await member.roles.add(uncertifiedRole);
 
         if (getEntranceChannelId) { // 入退室チャンネルに送信
             await (getEntranceChannelId as TextChannel).send({
