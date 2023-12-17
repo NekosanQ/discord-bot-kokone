@@ -1,4 +1,5 @@
 import { VoiceState } from "discord.js";
+import { appendFile } from '../module/file/appedFile';
 import { 
     createChannelEmbed, 
     userBlackListMenu, 
@@ -41,10 +42,12 @@ module.exports = {
         const userId = newMember ? `${newState.member?.user.id}` : oldMember ? `${oldState.member?.user.id}` : "";
         const defaultChannelName = `自動作成-${userName}`; // デフォルトのチャンネル名
         const deleteMap = new Map();
+        const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         // -----------------------------------------------------------------------------------------------------------
         // VC作成チャンネルに入った場合の処理
         // -----------------------------------------------------------------------------------------------------------
         if (oldState.channelId !== voiceChannelId && newState.channelId === voiceChannelId) {
+            appendFile("logs/vc_create.log", `[${date}] VCを作成しました <実行ユーザー/ID> ${userName}/${userId}\n`);
             const voiceChannel = newState.channel; // 特定のボイスチャンネルを取得
             voiceChannel?.clone({ // 特定のボイスチャンネルと同じカテゴリーに新しいボイスチャンネルを作成
                 name: defaultChannelName,

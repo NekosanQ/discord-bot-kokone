@@ -1,7 +1,7 @@
 import { EmbedBuilder, ActionRowBuilder, Interaction, ModalBuilder, ModalSubmitInteraction, StringSelectMenuInteraction, TextInputBuilder, TextInputStyle, VoiceChannel, UserSelectMenuInteraction, PermissionsBitField } from 'discord.js';
 import { botcolor } from "../config.json";
 import { PrismaClient } from '@prisma/client'
-
+import { appendFile } from '../module/file/appedFile';
 const prisma = new PrismaClient();
 
 const editChannelEmbed: EmbedBuilder = new EmbedBuilder()
@@ -57,6 +57,9 @@ changeBitRateModal.addComponents(changeBitRateRow);
 // -----------------------------------------------------------------------------------------------------------
 module.exports = {
 	async execute(interaction: Interaction): Promise<void> {
+        const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+        const userName: string = interaction.user.displayName;
+        const userId: string = String(interaction.user.id);
         try {
             if (interaction.isButton()) {
                 await require("../guildProcess/voicePublic").execute(interaction);
@@ -104,6 +107,7 @@ module.exports = {
                     // -----------------------------------------------------------------------------------------------------------
                     case "changeNameModal":
                         channelName = (interaction as ModalSubmitInteraction).fields.getTextInputValue("changeNameInput");
+                        appendFile("logs/vc_create.log", `[${date}] チャンネル名を変更しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
                         await channel.setName(channelName);
                         await interaction.reply({
                             content: `チャンネルの名前を${channelName}に変更しました`,
@@ -115,6 +119,7 @@ module.exports = {
                     // -----------------------------------------------------------------------------------------------------------
                     case "changePeopleLimitedModal":
                         channelUserLimit = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changePeopleLimitedInput"));
+                        appendFile("logs/vc_create.log", `[${date}] 人数制限を変更しました: ${channelUserLimit} <実行ユーザー/ID> ${userName}/${userId}\n`);
                         if (Number.isNaN(channelUserLimit)) {
                             await interaction.reply({
                                 content: `数字を入れてください`,
@@ -138,6 +143,7 @@ module.exports = {
                     // -----------------------------------------------------------------------------------------------------------
                     case "changeBitRateModal":
                         channelBitRate = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changeBitRateInput"));
+                        appendFile("logs/vc_create.log", `[${date}] ビットレートを変更しました: ${channelBitRate} <実行ユーザー/ID> ${userName}/${userId}\n`);
                         if (Number.isNaN(channelBitRate)) {
                             await interaction.reply({
                                 content: `数字を入れてください`,
@@ -157,7 +163,6 @@ module.exports = {
                         };
                         break;
                 };
-                const userId: string = String(interaction.user.id);
                 // -----------------------------------------------------------------------------------------------------------
                 // ユーザーをブロックする処理
                 // -----------------------------------------------------------------------------------------------------------
@@ -174,6 +179,7 @@ module.exports = {
                                 return;
                             };
                         };
+                        appendFile("logs/vc_create.log", `[${date}] ユーザーをブロックしました: ${blockUserId} <実行ユーザー/ID> ${userName}/${userId}\n`);
                         await prisma.blackLists.create({
                             data: {
                                 user_id: String(userId),
@@ -194,6 +200,7 @@ module.exports = {
                         const blockUserId: string = String((interaction as UserSelectMenuInteraction).values[i]);
                         for (let i = 0; i < allUsers.length; i++) {
                             if (String(allUsers[i].block_user_id) == blockUserId) { 
+                                appendFile("logs/vc_create.log", `[${date}] ユーザーのブロックを解除しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
                                 await prisma.blackLists.deleteMany({
                                     where: {
                                         user_id: String(userId),

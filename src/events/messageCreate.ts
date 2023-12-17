@@ -1,4 +1,4 @@
-import { Events, Message, TextChannel } from 'discord.js';
+import { Events, Message } from 'discord.js';
 import { appendFile } from '../module/file/appedFile';
 // -----------------------------------------------------------------------------------------------------------
 // メッセージ処理

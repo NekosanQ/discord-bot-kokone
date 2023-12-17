@@ -1,5 +1,6 @@
 import { ButtonInteraction, EmbedBuilder, Interaction, VoiceChannel } from "discord.js";
 import { botcolor } from "../config.json";
+import { appendFile } from '../module/file/appedFile';
 import { 
     operationMenu, 
     authenticatedRoleId,
@@ -21,6 +22,9 @@ module.exports = {
 	async execute(interaction: Interaction): Promise<void> {
         if (!interaction.isButton()) return;
         const channel = interaction.channel;
+        const userName = interaction.user.displayName;
+        const userId = interaction.user.id;
+        const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         // -----------------------------------------------------------------------------------------------------------
         // チャンネルを公開する時の処理
         // -----------------------------------------------------------------------------------------------------------
@@ -65,6 +69,7 @@ module.exports = {
                             ViewChannel: false
                         });
                     };
+                    appendFile("logs/vc_create.log", `[${date}] VCを公開しました <実行ユーザー/ID> ${userName}/${userId}\n`);
                     await (interaction as ButtonInteraction).reply({
                         content: "チャンネルを公開しました",
                         ephemeral: true

@@ -64,7 +64,7 @@ module.exports = {
                 })
             } else {
                 if (interaction.customId === "ticketbutton") { // お問い合わせ時の処理
-                    appendFile("logs/ticket.log", `[${date}] お問い合わせを作成しました <実行ユーザー/ID>: <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
+                    appendFile("logs/ticket.log", `[${date}] お問い合わせを作成しました <実行ユーザー表示名/名前/ID> ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
                     await interaction.guild.channels.create({
                         name: ticketChannelName,
                         parent: "1153219622036848660",
