@@ -17,11 +17,6 @@ const publicChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setTitle("ボイスチャンネルを公開しました")
     .setDescription("設定を行いたい場合、下のメニューから設定を行ってください\n※ブロック・ブロック解除の操作は行えません")
 
-const betaEmbed: EmbedBuilder = new EmbedBuilder()
-    .setColor(Number(botcolor))
-    .setTitle("現在のVC作成機能は開発段階のBeta版です。")
-    .setDescription("BOTの最終的な品質を示しているものではありません。ご理解とご支援ありがとうございます。グッドラック！\n(不具合や修正案、追加案があれば鯖主にご連絡を！)")
-
 module.exports = {
 	async execute(interaction: Interaction): Promise<void> {
         if (!interaction.isButton()) return;
@@ -72,7 +67,6 @@ module.exports = {
                     };
                     await (interaction as ButtonInteraction).reply({
                         content: "チャンネルを公開しました",
-                        embeds: [betaEmbed],
                         ephemeral: true
                     });
                     await interaction.message?.edit({
