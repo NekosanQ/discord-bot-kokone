@@ -19,7 +19,8 @@ const client: Client = new Client({
     ],
     partials: [
         Partials.Message, 
-        Partials.Channel
+        Partials.Channel,
+		Partials.GuildMember
     ],
 })
 

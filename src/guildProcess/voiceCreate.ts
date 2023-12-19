@@ -19,16 +19,12 @@ const prisma = new PrismaClient();
 // デフォルトであるボイスチャンネル
 const defaultChannelList: string[] = [
     "1161720349587669073", // 自動作成
-    "1043089821947678720", // 作業1
-    "1117728041532137494", // 作業2
-    "993406228346707988",  // ゲーム1
-    "993406391924568154",  // ゲーム2
+    "1043089821947678720", // 作業
+    "993406228346707988",  // ゲーム
     "993406601807536160",  // 色々1
     "1022153462806478860", // 色々2
-    "1068464214311714816", // 色々3
-    "1068465168746553385", // 色々4
 ];
-
+const deleteMap = new Map<string, NodeJS.Timeout>();
 // -----------------------------------------------------------------------------------------------------------
 // ボイスチャンネル作成機能
 // VC作成チャンネルにアクセス -> VC作成(権限管理) -> VC移動 
@@ -41,7 +37,6 @@ module.exports = {
         const userName = newMember ? `${newState.member?.user.displayName}` : oldMember ? `${oldState.member?.user.displayName}` : "unknown user";
         const userId = newMember ? `${newState.member?.user.id}` : oldMember ? `${oldState.member?.user.id}` : "";
         const defaultChannelName = `自動作成-${userName}`; // デフォルトのチャンネル名
-        const deleteMap = new Map();
         const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         // -----------------------------------------------------------------------------------------------------------
         // VC作成チャンネルに入った場合の処理
@@ -119,7 +114,7 @@ module.exports = {
                 if (oldState.channel?.members.size === 0) { // チャンネルに誰もいない場合
                     const timeout = setTimeout(() => { // 30秒後に削除する予約を作成
                         oldState.channel?.delete();
-                        deleteMap.delete(oldState.channel?.id);
+                        deleteMap.delete(oldState.channel?.id!);
                     }, 30 * 1000);
                     deleteMap.set(oldState.channel.id, timeout); // マップに予約を保存
                 };
@@ -135,9 +130,9 @@ module.exports = {
                 for (let i = 0; i < defaultChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
                     if (defaultChannelList[i] === newState.channelId) return;
                 };
-                if (deleteMap.has(newState.channel?.id)) { // マップに予約がある場合
-                    clearTimeout(deleteMap.get(newState.channel?.id)); // 予約をキャンセル
-                    deleteMap.delete(newState.channel?.id);
+                if (deleteMap.has(newState.channel?.id!)) { // マップに予約がある場合
+                    clearTimeout(deleteMap.get(newState.channel?.id!)); // 予約をキャンセル
+                    deleteMap.delete(newState.channel?.id!);
                 };
             } catch (error) {
                 console.log(error);
