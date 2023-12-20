@@ -27,7 +27,7 @@ module.exports = {
         if (interaction.customId === "selectlanguage") { // 言語を選択した時の処理
             const page: number = Number((interaction as StringSelectMenuInteraction).values[0].split("_")[1]);
             await interaction.reply({
-                embeds: [embeds.rule[page]],
+                embeds: [embeds.rule[page + 1]],
                 ephemeral: true,
             });
         };
