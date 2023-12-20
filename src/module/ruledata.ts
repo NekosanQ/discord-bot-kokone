@@ -31,7 +31,7 @@ export const languageMenu: ActionRowBuilder<StringSelectMenuBuilder> = new Actio
             },
             {
                 label: "한국어",
-                description: "Translated from Google",
+                description: "Translated from DeepL",
                 value: `page_3`,
             },
         ])
