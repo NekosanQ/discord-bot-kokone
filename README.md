@@ -3,5 +3,4 @@
 まだ書き直し部分が多いです...
 
 ## 猫の隠れ家-CatHideaway
-https://nekosanq.net/cathideaway <br>
-[招待リンク](https://nekosanq.net/cathideaway/invite)
+https://nekosanq.net/cathideaway/invite
