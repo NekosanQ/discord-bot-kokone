@@ -4,7 +4,7 @@
 Discordコミュニティ「猫の隠れ家-CatHideaway」で動作している専属BOTです。
 ## 主な機能
 ## 利用規約
-![利用規約](https://cdn.discordapp.com/attachments/954745154407911454/1195257604247650395/image.png?ex=65b35563&is=65a0e063&hm=c3d20f00da510ceb480d6c261c58f274826a0fc49b53d34846112a6891283216&)
+![利用規約](https://cdn.discordapp.com/attachments/954745154407911454/1195257604247650395/image.png?ex=65b35563&is=65a0e063&hm=c3d20f00da510ceb480d6c261c58f274826a0fc49b53d34846112a6891283216&)<br>
 コマンド: `/rule`<br>
 ### 言語の選択
 猫の隠れ家-CatHideawayでは、外国人の利用も多いので、以下の言語での利用規約の表示に対応しています。<br>
@@ -19,7 +19,7 @@ Discordコミュニティ「猫の隠れ家-CatHideaway」で動作している�
 「利用規約に同意する」ボタンを押すと、未認証ロールが外れ、認証ロールが付与されます。<br>
 これにより、非表示だったチャンネルが表示されるようになります。
 ## お問い合わせ機能(チケット機能)
-![お問い合わせ](https://cdn.discordapp.com/attachments/954745154407911454/1195258917563940984/image.png?ex=65b3569c&is=65a0e19c&hm=9d2541884ca901c7bb76390a1a32622dcce6178748b2b0b6efb702b0c9eb2393&)
+![お問い合わせ](https://cdn.discordapp.com/attachments/954745154407911454/1195258917563940984/image.png?ex=65b3569c&is=65a0e19c&hm=9d2541884ca901c7bb76390a1a32622dcce6178748b2b0b6efb702b0c9eb2393&)<br>
 コマンド: `/ticket`<br>
 現在、猫の隠れ家-CatHideawayではお問い合わせは、運営とお問い合わせ者のみでチャットが出来るシステムとなっています。<br>
 ### お問い合わせを開始する
