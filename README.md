@@ -1,7 +1,7 @@
 # DiscordBOT 「猫咲 心音」
 
 ## 概要
-Discordコミュニティ「猫の隠れ家-CatHideaway」で動作している専属BOT
+Discordコミュニティ「猫の隠れ家-CatHideaway」で動作している専属BOTです。
 ## 主な機能
 ## 利用規約
 ![利用規約](https://cdn.discordapp.com/attachments/954745154407911454/1195257604247650395/image.png?ex=65b35563&is=65a0e063&hm=c3d20f00da510ceb480d6c261c58f274826a0fc49b53d34846112a6891283216&)
