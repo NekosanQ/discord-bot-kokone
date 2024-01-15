@@ -2,9 +2,6 @@ import { Collection, EmbedBuilder, GuildMember, Message, PermissionsBitField, Ro
 import { setTimeout } from 'node:timers/promises';
 import { appendFile } from "../module/file/appedFile";
 import { config } from '../utils/config.js';
-const inviteChannelId: string = config.inviteChannelId; // 募集チャンネル
-const inviteRoleId: string[] = config.inviteRoleId;
-const checkmarkId: string = config.checkMarkId; // チェックマークの絵文字のID
 // -----------------------------------------------------------------------------------------------------------
 // 荒らし対策システム
 // -----------------------------------------------------------------------------------------------------------
@@ -34,7 +31,7 @@ module.exports = {
         // (ユーザーへのメンションは処理しない)
         // -----------------------------------------------------------------------------------------------------------
         const messageRole: Collection<string, Role> = message.mentions.roles; // メッセージに含まれているメンションを取得
-        if (message.channel.id == inviteChannelId && message.content.match("@")) {
+        if (message.channel.id == config.inviteChannelId && message.content.match("@")) {
             const voiceChannel = message.member?.voice.channel;
             if (!voiceChannel) {
                 const errorMessage: string = "ボイスチャンネルにいないユーザーのメンションを検出しました";
@@ -47,14 +44,14 @@ module.exports = {
             try {
                 let inviteMentionCount: number = 0; // 募集通知カウント
                 for (let key of messageRole.keys()) { // メンションの数だけ繰り返す
-                    for (let n = 0; n < inviteRoleId.length; n++) { // 募集通知のロールがあるか確認
-                        if (key == inviteRoleId[n]) { // 募集通知のロールがあった場合の処理
+                    for (let n = 0; n < config.inviteRoleId.length; n++) { // 募集通知のロールがあるか確認
+                        if (key == config.inviteRoleId[n]) { // 募集通知のロールがあった場合の処理
                             inviteMentionCount++; // 募集通知カウントを増やす
                         };
                     };
                 };
                 if (inviteMentionCount == messageRole.size) { // 募集通知のロールのみメンションされていた場合の処理
-                    await message.react(message.guild?.emojis.cache.get(checkmarkId) ?? "");
+                    await message.react(message.guild?.emojis.cache.get(config.checkMarkId) ?? "");
                 } else { // 募集通知以外のメンションがあった場合の処理
                     const errorMessage: string = "募集通知以外でのメンションを検出しました";
                     appendFile("logs/violation.log", `[${date}] ${errorMessage} <違反ユーザー/ID>: <違反ユーザー表示名/名前/ID>: ${message.author.displayName}/${message.author.username}/${message.author.id}\n`);

@@ -2,8 +2,8 @@ import { VoiceState } from "discord.js";
 import { appendFile } from "../module/file/appedFile";
 import { 
     createChannelEmbed, 
-    userBlackListMenu, 
-    userBlackReleaseListMenu, 
+    userBlockListMenu, 
+    userBlockReleaseListMenu, 
     operationMenu, 
     publicButton, 
     allowUserPermisson, 
@@ -14,7 +14,6 @@ import { PrismaClient } from "@prisma/client"
 import { config } from "../utils/config";
 const prisma = new PrismaClient();
 // デフォルトであるボイスチャンネル
-const defaultChannelList: string[] = config.defaultVoiceChannelList;
 const deleteMap = new Map<string, NodeJS.Timeout>();
 // -----------------------------------------------------------------------------------------------------------
 // ボイスチャンネル作成機能
@@ -65,7 +64,7 @@ module.exports = {
                     const channelBitRate = Number(newState.channel?.bitrate) / 1000;
                     let blockUserList = "なし";
 
-                    const allUsers = await prisma.blackLists.findMany({
+                    const allUsers = await prisma.blockLists.findMany({
                         where: {
                             user_id: String(newMember?.id)
                         },
@@ -82,7 +81,7 @@ module.exports = {
                                 { name: "ブロックしているユーザー", value: blockUserList}
                             )
                         ],
-                        components: [userBlackListMenu, userBlackReleaseListMenu, operationMenu, publicButton]
+                        components: [userBlockListMenu, userBlockReleaseListMenu, operationMenu, publicButton]
                     });
                 })
                 .catch((error: Error) => {
@@ -99,8 +98,8 @@ module.exports = {
         // -----------------------------------------------------------------------------------------------------------
         if (oldState.channelId && oldState.channelId !== newState.channelId) { 
             try {
-                for (let i = 0; i < defaultChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
-                    if (defaultChannelList[i] === oldState.channelId) return;
+                for (let i = 0; i < config.defaultVoiceChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
+                    if (config.defaultVoiceChannelList[i] === oldState.channelId) return;
                 };
                 if (oldState.channel?.members.size === 0) { // チャンネルに誰もいない場合
                     const timeout = setTimeout(() => { // 30秒後に削除する予約を作成
@@ -118,8 +117,8 @@ module.exports = {
         // -----------------------------------------------------------------------------------------------------------
         if (newState.channelId && newState.channelId !== oldState.channelId) {
             try {
-                for (let i = 0; i < defaultChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
-                    if (defaultChannelList[i] === newState.channelId) return;
+                for (let i = 0; i < config.defaultVoiceChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
+                    if (config.defaultVoiceChannelList[i] === newState.channelId) return;
                 };
                 if (deleteMap.has(newState.channel?.id!)) { // マップに予約がある場合
                     clearTimeout(deleteMap.get(newState.channel?.id!)); // 予約をキャンセル

@@ -1,13 +1,13 @@
 import { ButtonInteraction, EmbedBuilder, Interaction, VoiceChannel } from "discord.js";
-import { config } from "../utils/config"
-import { appendFile } from '../module/file/appedFile';
+import { config } from "../utils/config";
+import { appendFile } from "../module/file/appedFile";
 import { 
     operationMenu, 
     allowUserPermisson, 
     allowCreateUserPermisson,
     denyUserPermisson, 
 } from "../module/voiceCreateData";
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient();
 
@@ -21,7 +21,7 @@ module.exports = {
         const channel = interaction.channel;
         const userName = interaction.user.displayName;
         const userId = interaction.user.id;
-        const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+        const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
         // -----------------------------------------------------------------------------------------------------------
         // チャンネルを公開する時の処理
         // -----------------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ module.exports = {
                     } else {
                         channelUserLimit = `${channelUserLimit} 人`
                     };
-                    const channelBitRate = Number((interaction.channel as VoiceChannel)?.bitrate) / 1000;
+                    const channelBitRate: number = Number((interaction.channel as VoiceChannel)?.bitrate) / 1000;
                     // -----------------------------------------------------------------------------------------------------------
                     // チャンネルの権限をセットする
                     // -----------------------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ module.exports = {
                     // -----------------------------------------------------------------------------------------------------------
                     // ブロックしているユーザーがいた場合、チャンネルを表示しない
                     // -----------------------------------------------------------------------------------------------------------
-                    const allUsers = await prisma.blackLists.findMany({
+                    const allUsers = await prisma.blockLists.findMany({
                         where: {
                             user_id: String(interaction.user.id)
                         },

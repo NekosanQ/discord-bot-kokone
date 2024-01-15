@@ -1,7 +1,7 @@
-import { EmbedBuilder, ActionRowBuilder, Interaction, ModalBuilder, ModalSubmitInteraction, StringSelectMenuInteraction, TextInputBuilder, TextInputStyle, VoiceChannel, UserSelectMenuInteraction, PermissionsBitField } from 'discord.js';
+import { EmbedBuilder, ActionRowBuilder, Interaction, ModalBuilder, ModalSubmitInteraction, StringSelectMenuInteraction, TextInputBuilder, TextInputStyle, VoiceChannel, UserSelectMenuInteraction, PermissionsBitField } from "discord.js";
 import { config } from "../utils/config";
-import { PrismaClient } from '@prisma/client'
-import { appendFile } from '../module/file/appedFile';
+import { PrismaClient } from "@prisma/client";
+import { appendFile } from "../module/file/appedFile";
 const prisma = new PrismaClient();
 
 const editChannelEmbed: EmbedBuilder = new EmbedBuilder()
@@ -57,7 +57,7 @@ changeBitRateModal.addComponents(changeBitRateRow);
 // -----------------------------------------------------------------------------------------------------------
 module.exports = {
 	async execute(interaction: Interaction): Promise<void> {
-        const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+        const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
         const userName: string = interaction.user.displayName;
         const userId: string = String(interaction.user.id);
         try {
@@ -96,7 +96,7 @@ module.exports = {
             let channelBitRate: number = 64;
             
             if (channel && channel.type === 2) { // チャンネルがボイスチャンネルかどうか確認
-                let allUsers = await prisma.blackLists.findMany({
+                let allUsers = await prisma.blockLists.findMany({
                     where: {
                         user_id: String(interaction.user.id)
                     },
@@ -166,10 +166,10 @@ module.exports = {
                 // -----------------------------------------------------------------------------------------------------------
                 // ユーザーをブロックする処理
                 // -----------------------------------------------------------------------------------------------------------
-                if (interaction.customId == "userBlackList") {
+                if (interaction.customId == "userBlockList") {
                     for (let i = 0; i < (interaction as UserSelectMenuInteraction).values.length; i++) {
                         const blockUserId: String = String((interaction as UserSelectMenuInteraction).values[i]);
-                        // Prismaを使ってBlackListsテーブルにレコードを作成
+                        // Prismaを使ってBlockListsテーブルにレコードを作成
                         for (let i = 0; i < allUsers.length; i++) {
                             if (String(allUsers[i].block_user_id) == blockUserId) { 
                                 interaction.reply({
@@ -180,7 +180,7 @@ module.exports = {
                             };
                         };
                         appendFile("logs/vc_create.log", `[${date}] ユーザーをブロックしました: ${blockUserId} <実行ユーザー/ID> ${userName}/${userId}\n`);
-                        await prisma.blackLists.create({
+                        await prisma.blockLists.create({
                             data: {
                                 user_id: String(userId),
                                 block_user_id: String(blockUserId)
@@ -195,13 +195,13 @@ module.exports = {
                 // -----------------------------------------------------------------------------------------------------------
                 // ユーザーのブロックを解除する処理
                 // -----------------------------------------------------------------------------------------------------------
-                if (interaction.customId == "userBlackReleaseList") {
+                if (interaction.customId == "userBlockReleaseList") {
                     for (let i = 0; i < (interaction as UserSelectMenuInteraction).values.length; i++) {
                         const blockUserId: string = String((interaction as UserSelectMenuInteraction).values[i]);
                         for (let i = 0; i < allUsers.length; i++) {
                             if (String(allUsers[i].block_user_id) == blockUserId) { 
                                 appendFile("logs/vc_create.log", `[${date}] ユーザーのブロックを解除しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
-                                await prisma.blackLists.deleteMany({
+                                await prisma.blockLists.deleteMany({
                                     where: {
                                         user_id: String(userId),
                                         block_user_id: String(blockUserId)
@@ -218,7 +218,7 @@ module.exports = {
                 // -----------------------------------------------------------------------------------------------------------
                 // チャンネルの設定を更新するための処理
                 // -----------------------------------------------------------------------------------------------------------
-                allUsers = await prisma.blackLists.findMany({ // メッセージを更新するためにデータを再度取得する
+                allUsers = await prisma.blockLists.findMany({ // メッセージを更新するためにデータを再度取得する
                     where: {
                         user_id: String(interaction.user.id)
                     },

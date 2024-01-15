@@ -1,8 +1,6 @@
 import { Channel, EmbedBuilder, Events, GuildMember, TextChannel } from 'discord.js';
 import { config } from "../utils/config";
-import log4js from 'log4js';config.botColor
-const logger = log4js.getLogger();
-logger.level = "info";
+import { logger } from "../utils/log";
 
 // -----------------------------------------------------------------------------------------------------------
 // 入室通知
@@ -46,9 +44,9 @@ module.exports = {
         };
         if (getChatChannelId) { // 雑談チャンネルに送信
             await (getChatChannelId as TextChannel).send({
-                content: `<@&813892624335241247>新規さん来たよ！`,
+                content: `<@&${config.newMemberNoticeRoleId}>新規さん来たよ！`,
                 embeds: [welcomeMessageEmbed.chat]
             });
         };
     }
-}
+};

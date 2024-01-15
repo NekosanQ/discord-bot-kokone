@@ -22,7 +22,8 @@ uncertifiedRoleId = "1189556243094835287"
 authenticatedRoleId = "1189556243094835288"
 # everyoneロール
 everyoneRoleId = "1189556242973196359"
-
+# 新規さん通知ロール
+newMemberNoticeRoleId = "1189556243052896266"
 # BOTのカラーコード
 botColor = "0xb9d98b"
 # エラーカラーコード

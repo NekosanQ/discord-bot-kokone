@@ -20,6 +20,7 @@ export interface Config {
     uncertifiedRoleId: string;
     authenticatedRoleId: string;
     everyoneRoleId: string;
+    newMemberNoticeRoleId: string;
     botColor: string;
     errorColor: string;
     defaultVoiceChannelList: string[];

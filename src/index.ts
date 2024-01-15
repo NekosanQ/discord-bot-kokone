@@ -1,5 +1,5 @@
 //必要なパッケージをインポートする
-import { Client, Collection, GatewayIntentBits, Interaction, Partials } from "discord.js"
+import { Client, Collection, GatewayIntentBits, Partials } from "discord.js"
 import dotenv from "dotenv"
 import fs from "node:fs"
 import path from "node:path"

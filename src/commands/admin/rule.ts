@@ -1,9 +1,8 @@
 import { Interaction, PermissionsBitField, SlashCommandBuilder, StringSelectMenuInteraction } from "discord.js";
 import { languageMenu, embeds, agreeButton } from "../../module/ruledata";
 import { appendFile } from "../../module/file/appedFile";
-import { config } from "../../utils/config"
-import log4js from 'log4js';
-const logger = log4js.getLogger();
+import { config } from "../../utils/config";
+import { logger } from "../../utils/log";
 logger.level = "info";
 
 module.exports = {
@@ -32,10 +31,10 @@ module.exports = {
         };
         if (interaction.customId === "agreebutton") {  // 利用規約に同意した時の処理
             try {
-                const role: boolean = interaction.member.roles.cache.has(config.uncertifiedRole);
+                const role: boolean = interaction.member.roles.cache.has(config.uncertifiedRoleId);
                 if (role) {
-                    await interaction.member.roles.remove(config.uncertifiedRole);
-                    await interaction.member.roles.add(config.uncertifiedRole);
+                    await interaction.member.roles.remove(config.uncertifiedRoleId);
+                    await interaction.member.roles.add(config.uncertifiedRoleId);
                     await interaction.reply({
                         embeds: [embeds.completed],
                         ephemeral: true,

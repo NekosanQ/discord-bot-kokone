@@ -1,8 +1,7 @@
 import { Channel, EmbedBuilder, Events, GuildMember, TextChannel } from 'discord.js';
 import { config } from "../utils/config";
-import log4js from 'log4js';
-const logger = log4js.getLogger();
-logger.level = "info";
+import { logger } from "../utils/log";
+
 // -----------------------------------------------------------------------------------------------------------
 // 退室通知
 // -----------------------------------------------------------------------------------------------------------

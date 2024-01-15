@@ -12,17 +12,17 @@ export const settingChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setDescription("二段階認証をしている場合、手動でチャンネルの設定やボイスチャットメンバーへのミュートなどが行えます。\n二段階認証していない場合、BOTからチャンネルの設定を行う事が出来ます\n※引き継がれるのはブロックしているユーザー・ロールのみです。チャンネル名などは引き継がれません。")
 
 // ブロックするユーザーを選択するためのセレクトメニュー
-export const userBlackListMenu: ActionRowBuilder<UserSelectMenuBuilder> = new ActionRowBuilder<UserSelectMenuBuilder>().setComponents(
+export const userBlockListMenu: ActionRowBuilder<UserSelectMenuBuilder> = new ActionRowBuilder<UserSelectMenuBuilder>().setComponents(
     new UserSelectMenuBuilder()
-        .setCustomId("userBlackList")
+        .setCustomId("userBlockList")
         .setPlaceholder("ブロックするユーザーを選択")
         .setMaxValues(10)
         .setMinValues(1)
 );
 // ブロックしているユーザーを解除選択するためのセレクトメニュー
-export const userBlackReleaseListMenu: ActionRowBuilder<UserSelectMenuBuilder> = new ActionRowBuilder<UserSelectMenuBuilder>().setComponents(
+export const userBlockReleaseListMenu: ActionRowBuilder<UserSelectMenuBuilder> = new ActionRowBuilder<UserSelectMenuBuilder>().setComponents(
     new UserSelectMenuBuilder()
-        .setCustomId("userBlackReleaseList")
+        .setCustomId("userBlockReleaseList")
         .setPlaceholder("ブロックを解除するユーザーを選択")
         .setMaxValues(10)
         .setMinValues(1)
