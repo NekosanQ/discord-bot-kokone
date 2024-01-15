@@ -1,4 +1,3 @@
-![image](https://github.com/NekosanQ/DiscordBOT-Kokone/assets/89909994/6ac6848d-39b9-4ddc-af5a-d48180a91d09)![image](https://github.com/NekosanQ/DiscordBOT-Kokone/assets/89909994/7a15c16c-aca6-4aa0-929f-9f7d4bb03980)
 # DiscordBOT 「猫咲 心音」
 
 ## 概要
