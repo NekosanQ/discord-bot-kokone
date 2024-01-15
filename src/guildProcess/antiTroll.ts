@@ -1,4 +1,4 @@
-import { Collection, EmbedBuilder, GuildMember, Message, PermissionsBitField, Role, TextChannel } from "discord.js";
+import { Collection, EmbedBuilder, GuildMember, Message, PermissionsBitField, Role } from "discord.js";
 import { setTimeout } from 'node:timers/promises';
 import { appendFile } from "../module/file/appedFile";
 import { config } from '../utils/config.js';
