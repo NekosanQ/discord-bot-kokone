@@ -13,6 +13,7 @@ Discordコミュニティ「猫の隠れ家-CatHideaway」で動作している�
 - 中国語(繁体字)
 - 中国語(簡体字)
 - 韓国語
+  
 日本語以外の言語は、セレクトメニューで操作するようになっています。
 ![言語の選択](https://cdn.discordapp.com/attachments/954745154407911454/1196326806974898338/image.png?ex=65b73929&is=65a4c429&hm=4d4f6eacc3e71677191c09f7076a163982c08ea073d742b7463d523fa3c7e8e1&)
 ### 利用規約の同意
@@ -56,7 +57,9 @@ __※このボタンを押すまでは、誰もVCを閲覧する事は出来ま�
 - お問い合わせ履歴
 - 違反者の履歴
 - 利用規約同意者
-このログを毎日０時に指定したチャンネルに送信し、ログファイルをリセットします。
+
+このログを毎日０時に指定したチャンネルに送信し、ログファイルをリセットします。<br>
+![ログ送信](https://cdn.discordapp.com/attachments/954745154407911454/1196335851056136323/image.png?ex=65b74195&is=65a4cc95&hm=ec47090d36c52014c57e71014000e939e1e6b2f6897320d4835cc9fa6b9a2cc2&)
 ## 猫の隠れ家-CatHideaway
 [公式ホームページ](https://nekosanq.net/cathideaway.html)<br>
 [招待リンク](https://nekosanq.net/cathideaway/invite)
