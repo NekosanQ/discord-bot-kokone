@@ -13,10 +13,10 @@ const allowPermisson: bigint[] = [
 ];
 
 const ticketEmbed: EmbedBuilder = new EmbedBuilder()
-    .setColor(Number(config.botColor))
-    .setTitle("お問い合わせ")
-    .setDescription("お問い合わせフォーラムで投稿出来ない問題などを、運営と直接話したい場合に使用してください。\n__運営などへ連絡する際、DMやメンションなどはせず、必ずお問い合わせを作成して連絡を取ってください。__")
-    .setFields({ name: "注意", value: "・お問い合わせを作成して一時間経ってもメッセージを送らない場合は自動的にチャンネルが削除されます\n・お問い合わせは複数作成出来ません\n・世間話などの目的で使用するのは禁止です"})
+    .setColor(Number(botcolor))
+    .setTitle("チケット作成")
+    .setDescription("お問い合わせフォーラムで投稿出来ない問題などを、運営と直接話したい場合に使用してください。\n__運営などへ連絡する際、DMやメンションなどはせず、必ずチケットを作成して連絡を取ってください。__")
+    .setFields({ name: "注意", value: "・チケットを作成して一時間経ってもメッセージを送らない場合は自動的にチャンネルが削除されます\n・チケットは複数作成出来ません\n・世間話などの目的で使用するのは禁止です"})
 const ticketButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId("ticketbutton")
