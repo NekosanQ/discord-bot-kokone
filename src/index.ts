@@ -8,8 +8,11 @@ import { CustomCommand } from "./types/client"
 //.envファイルを読み込む
 dotenv.config()
 
-//Botで使うGetwayIntents、partials   n 
-const client: Client = new Client({
+/**
+ * Discord Client
+ */
+export const client: Client = new Client({
+	//Botで使うGetwayIntents、partials
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
@@ -20,7 +23,7 @@ const client: Client = new Client({
     partials: [
         Partials.Message, 
         Partials.Channel
-    ],
+    ]
 })
 
 client.commands = new Collection();

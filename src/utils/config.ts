@@ -8,6 +8,7 @@ import { exit } from "process";
  * コンフィグファイルの構造
  */
 export interface Config {
+    customVcChannelIdList: any;
     clientId: string;
     developerGuildId: string;
     generalGuildId: string;

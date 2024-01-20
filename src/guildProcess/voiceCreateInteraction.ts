@@ -1,4 +1,16 @@
-import { EmbedBuilder, ActionRowBuilder, Interaction, ModalBuilder, ModalSubmitInteraction, StringSelectMenuInteraction, TextInputBuilder, TextInputStyle, VoiceChannel, UserSelectMenuInteraction, PermissionsBitField } from "discord.js";
+import { 
+    EmbedBuilder, 
+    ActionRowBuilder, 
+    Interaction, 
+    ModalBuilder, 
+    ModalSubmitInteraction, 
+    StringSelectMenuInteraction, 
+    TextInputBuilder, 
+    TextInputStyle, 
+    VoiceChannel, 
+    PermissionsBitField, 
+} from "discord.js";
+import { MenuInteraction, channelSettingUpdate, channelUserLimitMessage, editChannelPermission, getChannelOwner, showBlockList } from "../module/voiceController";
 import { config } from "../utils/config";
 import { PrismaClient } from "@prisma/client";
 import { appendFile } from "../module/file/appedFile";
@@ -31,14 +43,14 @@ const changePeopleLimitedInput: TextInputBuilder = new TextInputBuilder()
     .setPlaceholder("0~99人までです(0人の場合は無制限になります)")
     .setStyle(TextInputStyle.Short)
 
-const changeBitRateModal: ModalBuilder = new ModalBuilder()
-    .setCustomId("changeBitRateModal")
+const changeBitrateModal: ModalBuilder = new ModalBuilder()
+    .setCustomId("changeBitrateModal")
     .setTitle("ビットレートの変更");
       
-const changeBitRateInput: TextInputBuilder = new TextInputBuilder()
+const changeBitrateInput: TextInputBuilder = new TextInputBuilder()
     .setMaxLength(3)
     .setMinLength(1)
-    .setCustomId("changeBitRateInput")
+    .setCustomId("changeBitrateInput")
     .setLabel("変更するビットレート数を入力してください")
     .setPlaceholder("8~384Kbpsまでです(64kbps以下は非推奨です)")
     .setStyle(TextInputStyle.Short)
@@ -49,219 +61,244 @@ changeNameModal.addComponents(changeNameRow);
 const changePeopleLimitedRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(changePeopleLimitedInput);
 changePeopleLimitedModal.addComponents(changePeopleLimitedRow);
 
-const changeBitRateRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(changeBitRateInput);
-changeBitRateModal.addComponents(changeBitRateRow);
-
+const changeBitrateRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(changeBitrateInput);
+changeBitrateModal.addComponents(changeBitrateRow);
 // -----------------------------------------------------------------------------------------------------------
 // ボイスチャンネル作成のインタラクション処理
 // -----------------------------------------------------------------------------------------------------------
+/**
+ * @param interaction インタラクション
+ */
 module.exports = {
 	async execute(interaction: Interaction): Promise<void> {
         const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
         const userName: string = interaction.user.displayName;
         const userId: string = String(interaction.user.id);
         try {
-            if (interaction.isButton()) {
-                await require("../guildProcess/voicePublic").execute(interaction);
-            };
-            if (!interaction.isStringSelectMenu()&&!interaction.isModalSubmit()&&!interaction.isUserSelectMenu()) return;
+            if (!interaction.isButton() && !interaction.isStringSelectMenu() && !interaction.isModalSubmit() && !interaction.isUserSelectMenu()) return;
             if (!interaction.memberPermissions?.has(PermissionsBitField.Flags.ManageChannels)) {
                 await interaction.reply({
                     content: "あなたにはチャンネルの設定をする権限がありません",
                     ephemeral: true
-                })
+                });
                 return;
             };
-            // -----------------------------------------------------------------------------------------------------------
-            // チャンネルの設定
-            // -----------------------------------------------------------------------------------------------------------
-            if (interaction.customId === "operationMenu") {
-                const operationPage = (interaction as StringSelectMenuInteraction).values[0].split("_")[0];
-                switch (operationPage) {
-                    case "name": // 名前
-                        await (interaction as StringSelectMenuInteraction).showModal(changeNameModal);
-                        break;
-                    case "peopleLimited": // 人数制限
-                        await (interaction as StringSelectMenuInteraction).showModal(changePeopleLimitedModal);
-                        break;
-                    case "bitrate": // ビットレート
-                        await (interaction as StringSelectMenuInteraction).showModal(changeBitRateModal);
-                        break;
-                };
-            };
-            
+            let channelBitrate: number = 64;
             const channel = interaction.channel;
-            let channelName: string = "";
-            let channelUserLimit: number | string = 0;
-            let channelBitRate: number = 64;
-            
-            if (channel && channel.type === 2) { // チャンネルがボイスチャンネルかどうか確認
-                let allUsers = await prisma.blockLists.findMany({
-                    where: {
-                        user_id: String(interaction.user.id)
-                    },
-                });
-                switch (interaction.customId) {
-                    // -----------------------------------------------------------------------------------------------------------
-                    // チャンネル名の変更
-                    // -----------------------------------------------------------------------------------------------------------
-                    case "changeNameModal":
-                        channelName = (interaction as ModalSubmitInteraction).fields.getTextInputValue("changeNameInput");
-                        appendFile("logs/vc_create.log", `[${date}] チャンネル名を変更しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
-                        await channel.setName(channelName);
-                        await interaction.reply({
-                            content: `チャンネルの名前を${channelName}に変更しました`,
-                            ephemeral: true
-                        })
-                        break;
-                    // -----------------------------------------------------------------------------------------------------------
-                    // 人数制限の変更
-                    // -----------------------------------------------------------------------------------------------------------
-                    case "changePeopleLimitedModal":
-                        channelUserLimit = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changePeopleLimitedInput"));
-                        appendFile("logs/vc_create.log", `[${date}] 人数制限を変更しました: ${channelUserLimit} <実行ユーザー/ID> ${userName}/${userId}\n`);
-                        if (Number.isNaN(channelUserLimit)) {
-                            await interaction.reply({
-                                content: `数字を入れてください`,
-                                ephemeral: true
-                            });
-                        } else if (channelUserLimit > 99) {
-                            await interaction.reply({
-                                content: `変更できる人数制限の値は0~99人までです`,
-                                ephemeral: true
-                            });
-                        } else {
-                            await channel.setUserLimit(channelUserLimit);
-                            await interaction.reply({
-                                content: `チャンネルの人数制限を${channelUserLimit}人に変更しました`,
-                                ephemeral: true
-                            });
-                        };
-                        break;
-                    // -----------------------------------------------------------------------------------------------------------
-                    // ビットレートの変更
-                    // -----------------------------------------------------------------------------------------------------------
-                    case "changeBitRateModal":
-                        channelBitRate = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changeBitRateInput"));
-                        appendFile("logs/vc_create.log", `[${date}] ビットレートを変更しました: ${channelBitRate} <実行ユーザー/ID> ${userName}/${userId}\n`);
-                        if (Number.isNaN(channelBitRate)) {
-                            await interaction.reply({
-                                content: `数字を入れてください`,
-                                ephemeral: true
-                            });
-                        } else if (channelBitRate < 8 || channelBitRate > 384) {
-                            await interaction.reply({
-                                content: `変更できるビットレートの値は8~384kbpsまでです`,
-                                ephemeral: true
-                            });
-                        } else {
-                            await channel.setBitrate(channelBitRate * 1000);
-                            await interaction.reply({
-                                content: `チャンネルのビットレートを${channelBitRate}kbpsに変更しました`,
-                                ephemeral: true
-                            });
-                        };
-                        break;
+            switch (interaction.customId) {
+                // -----------------------------------------------------------------------------------------------------------
+                // チャンネルの公開
+                // -----------------------------------------------------------------------------------------------------------
+                case "publicButton": {
+                    await require("../guildProcess/voicePublic").execute(interaction);
+                    break;
                 };
                 // -----------------------------------------------------------------------------------------------------------
-                // ユーザーをブロックする処理
+                // チャンネルの設定
                 // -----------------------------------------------------------------------------------------------------------
-                if (interaction.customId == "userBlockList") {
-                    for (let i = 0; i < (interaction as UserSelectMenuInteraction).values.length; i++) {
-                        const blockUserId: String = String((interaction as UserSelectMenuInteraction).values[i]);
-                        // Prismaを使ってBlockListsテーブルにレコードを作成
-                        for (let i = 0; i < allUsers.length; i++) {
-                            if (String(allUsers[i].block_user_id) == blockUserId) { 
-                                interaction.reply({
-                                    content: "既にブロックしているユーザーを選択しています。",
-                                    ephemeral: true
-                                });
-                                return;
-                            };
+                case "operationMenu": {
+                    const operationPage = (interaction as StringSelectMenuInteraction).values[0].split("_")[0];
+                    switch (operationPage) {
+                        case "name": { // 名前
+                            await (interaction as StringSelectMenuInteraction).showModal(changeNameModal);
+                            break;
                         };
-                        appendFile("logs/vc_create.log", `[${date}] ユーザーをブロックしました: ${blockUserId} <実行ユーザー/ID> ${userName}/${userId}\n`);
-                        await prisma.blockLists.create({
-                            data: {
-                                user_id: String(userId),
-                                block_user_id: String(blockUserId)
-                            }
+                        case "peopleLimited": { // 人数制限
+                            await (interaction as StringSelectMenuInteraction).showModal(changePeopleLimitedModal);
+                            break;
+                        };
+                        case "Bitrate": { // ビットレート
+                            await (interaction as StringSelectMenuInteraction).showModal(changeBitrateModal);
+                            break;
+                        };
+                    };
+                }
+                // -----------------------------------------------------------------------------------------------------------
+                // チャンネル名の変更
+                // -----------------------------------------------------------------------------------------------------------
+                case "changeNameModal": {
+                    if (!interaction.isModalSubmit()) return;
+                    if (!channel) return;
+                    await interaction.deferReply({ ephemeral: true });
+                    const channelName = (interaction as ModalSubmitInteraction).fields.getTextInputValue("changeNameInput");
+                    appendFile("logs/vc_create.log", `[${date}] チャンネル名を変更しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
+                    await (channel as VoiceChannel).setName(channelName);
+                    await interaction.editReply({
+                        content: `チャンネルの名前を${channelName}に変更しました`
+                    });
+                    break;
+                };
+                // -----------------------------------------------------------------------------------------------------------
+                // 人数制限の変更
+                // -----------------------------------------------------------------------------------------------------------
+                case "changePeopleLimitedModal": {
+                    if (!interaction.isModalSubmit()) return;
+
+                    let channelUserLimit: number | string = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changePeopleLimitedInput"));
+                    appendFile("logs/vc_create.log", `[${date}] 人数制限を変更しました: ${channelUserLimit} <実行ユーザー/ID> ${userName}/${userId}\n`);
+                    if (Number.isNaN(channelUserLimit)) {
+                        await interaction.reply({
+                            content: `数字を入れてください`,
+                            ephemeral: true
+                        });
+                    } else if (channelUserLimit > 99) {
+                        await interaction.reply({
+                            content: `変更できる人数制限の値は0~99人までです`,
+                            ephemeral: true
+                        });
+                    } else {
+                        await (channel as VoiceChannel).setUserLimit(channelUserLimit);
+                        channelUserLimit = channelUserLimitMessage(channelUserLimit)
+                        await interaction.reply({
+                            content: `チャンネルの人数制限を${channelUserLimit}に変更しました`,
+                            ephemeral: true
                         });
                     };
-                    await interaction.reply({
-                        content: "選択したユーザーのブロックが完了しました",
-                        ephemeral: true
-                    });
+                    break;
                 };
                 // -----------------------------------------------------------------------------------------------------------
-                // ユーザーのブロックを解除する処理
+                // ビットレートの変更
                 // -----------------------------------------------------------------------------------------------------------
-                if (interaction.customId == "userBlockReleaseList") {
-                    for (let i = 0; i < (interaction as UserSelectMenuInteraction).values.length; i++) {
-                        const blockUserId: string = String((interaction as UserSelectMenuInteraction).values[i]);
+                case "changeBitrateModal": {
+                    if (!interaction.isModalSubmit()) return;
+
+                    channelBitrate = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changeBitrateInput"));
+                    appendFile("logs/vc_create.log", `[${date}] ビットレートを変更しました: ${channelBitrate} <実行ユーザー/ID> ${userName}/${userId}\n`);
+                    if (Number.isNaN(channelBitrate)) {
+                        await interaction.reply({
+                            content: `数字を入れてください`,
+                            ephemeral: true
+                        });
+                    } else if (channelBitrate < 8 || channelBitrate > 384) {
+                        await interaction.reply({
+                            content: `変更できるビットレートの値は8~384kbpsまでです`,
+                            ephemeral: true
+                        });
+                    } else {
+                        await (channel as VoiceChannel).setBitrate(channelBitrate * 1000);
+                        await interaction.reply({
+                            content: `チャンネルのビットレートを${channelBitrate}kbpsに変更しました`,
+                            ephemeral: true
+                        });
+                    };
+                    break;
+                };
+                // -----------------------------------------------------------------------------------------------------------
+                // ユーザーのブロック
+                // -----------------------------------------------------------------------------------------------------------
+                case "userBlockList": {
+                    if (!interaction.isUserSelectMenu()) return;
+                    await interaction.deferReply({ 
+                        ephemeral: true 
+                    });
+                    const selectedMemberNum = interaction.values.length;
+                    const allUsers = await prisma.blockLists.findMany({ // ブロックしたユーザーを取得
+                        where: {
+                            user_id: String(interaction.user.id),
+                        }
+                    });
+                    // ブロック処理
+                    const alreadyBlockedUsers: string[] = [];
+                    const privilegedUsers: string[] = [];
+                    for (let i = 0; i < selectedMemberNum; i++) {
+                        const blockUserId: string = String(interaction.values[i]);
+                        // Prismaを使ってBlackListsテーブルにレコードを作成
+                        if (allUsers.find((user: { block_user_id: string; }) => String(user.block_user_id) === blockUserId)) {
+                            alreadyBlockedUsers.push(blockUserId);
+                        } else if (await validatePrivilegedUser(interaction, blockUserId)) {
+                            privilegedUsers.push(blockUserId);
+                        } else {
+                            await prisma.blockLists.create({
+                                data: {
+                                    user_id: String(interaction.user.id),
+                                    block_user_id: String(blockUserId)
+                                }
+                            });
+                        };
+                    };
+                    const blockedUserNum = selectedMemberNum - privilegedUsers.length - alreadyBlockedUsers.length; // ブロック出来るユーザーの数
+                    let replyMessage = `選択した${selectedMemberNum}人${selectedMemberNum === blockedUserNum ? '' : `の内${blockedUserNum}人`}のユーザーのブロックが完了しました。\n`;
+                    if (blockedUserNum == 0) {
+                        replyMessage = `全員のブロックをする事が出来ませんでした`;
+                    } else if (privilegedUsers.length > 0) {
+                        const errorUsersString = privilegedUsers
+                            .map((userId) => `<@${userId}>`)
+                            .join(', ');
+                         replyMessage += `${errorUsersString} はブロックできませんでした。\n`;
+                    } else if (alreadyBlockedUsers.length > 0) {
+                        const errorUsersString = alreadyBlockedUsers
+                            .map((userId) => `<@${userId}>`)
+                            .join(', ');
+                        replyMessage += `${errorUsersString} は既にブロックされているためブロックできませんでした。\n`;
+                    }
+                    await interaction.editReply({
+                        content: replyMessage
+                    });
+                    break;
+                };
+                case "userBlockReleaseList": {
+                    if (!interaction.isUserSelectMenu()) return;
+                    await interaction.deferReply({ ephemeral: true });
+                    // ブロックしたユーザーを取得
+                    const userId: string = String(interaction.user.id);
+                    const allUsers = await prisma.blockLists.findMany({
+                        where: {
+                            user_id: String(interaction.user.id),
+                        },
+                    });
+                    // ブロック解除処理
+                    for (let i = 0; i < interaction.values.length; i++) {
+                        const blockUserId: string = String(interaction.values[i]);
                         for (let i = 0; i < allUsers.length; i++) {
-                            if (String(allUsers[i].block_user_id) == blockUserId) { 
-                                appendFile("logs/vc_create.log", `[${date}] ユーザーのブロックを解除しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
+                            if (String(allUsers[i].block_user_id) === blockUserId) {
                                 await prisma.blockLists.deleteMany({
                                     where: {
                                         user_id: String(userId),
-                                        block_user_id: String(blockUserId)
-                                    }
+                                        block_user_id: String(blockUserId),
+                                    },
                                 });
                             };
                         };
                     };
-                    await interaction.reply({
-                        content: "選択したユーザーのブロック解除が完了しました",
-                        ephemeral: true
+                    // リプライを送信
+                    await interaction.editReply({
+                        content: '選択したユーザーのブロック解除が完了しました',
                     });
+                    break;
                 };
-                // -----------------------------------------------------------------------------------------------------------
-                // チャンネルの設定を更新するための処理
-                // -----------------------------------------------------------------------------------------------------------
-                allUsers = await prisma.blockLists.findMany({ // メッセージを更新するためにデータを再度取得する
-                    where: {
-                        user_id: String(interaction.user.id)
-                    },
-                });
-                channelName = (interaction.channel as VoiceChannel).name;
-                channelUserLimit = (interaction.channel as VoiceChannel)?.userLimit;
-                if (channelUserLimit === 0) {
-                    channelUserLimit = "無制限";
-                } else {
-                    channelUserLimit = `${channelUserLimit}人`
-                };
-                channelBitRate = Number((interaction.channel as VoiceChannel)?.bitrate) / 1000;
-
-                let blockUserList: string = "なし";
-
-                for (let i = 0; i < allUsers.length; i++) { // ユーザーのブロックリストを全て取得して出力
-                    if (blockUserList == "なし") blockUserList = "";
-                    blockUserList += `<@${String(allUsers[i].block_user_id)}>\n`;
-                };
-                // -----------------------------------------------------------------------------------------------------------
-                // チャンネルの設定メッセージを更新する処理
-                // (公開されていた場合、ブロックしているユーザー一覧は表示しない)
-                // (公開されていない場合、必ずコンポーネントの数は4になる)
-                // -----------------------------------------------------------------------------------------------------------
-                const voiceCreateComponents = interaction.message?.components.length; // 設定メッセージのコンポーネントの数を取得
-                if (voiceCreateComponents === 4) {
-                    await interaction.message?.edit({
-                        embeds: [
-                            editChannelEmbed.setFields(
-                                { name: "現在の設定", value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitRate}kbps` },
-                                { name: "ブロックしているユーザー", value: blockUserList }
-                            )
-                        ]
-                    });
-                } else {
-                    await interaction.message?.edit({
-                        embeds: [
-                            editChannelEmbed.setFields(
-                                { name: "現在の設定", value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitRate}kbps` },
-                            )
-                        ]
-                    });
-                }
+            };
+            // -----------------------------------------------------------------------------------------------------------
+            // チャンネルの設定を更新するための処理
+            // -----------------------------------------------------------------------------------------------------------
+            await interaction.message?.edit({
+                embeds: [
+                    editChannelEmbed.setFields(await channelSettingUpdate(interaction))
+                ]
+            });
+            // -----------------------------------------------------------------------------------------------------------
+            // チャンネルの設定メッセージを更新する処理
+            // (公開されていた場合、ブロックしているユーザー一覧は表示しない)
+            // (公開されていない場合、必ずコンポーネントの数は4になる)
+            // -----------------------------------------------------------------------------------------------------------
+            /**
+             * ブロックするユーザーの特権チェックを行う。
+             * @param interaction インタラクション
+             * @param blockUserId ブロックするユーザーのID
+             * @returns 特権があればtrue、なければfalse
+             */
+            async function validatePrivilegedUser(
+                interaction: MenuInteraction,
+                blockUserId: string,
+            ): Promise<boolean> {
+                // 自身のIDを取得
+                const userId: string = String(interaction.user.id);
+                // メンバーを取得
+                const member = await interaction.guild?.members.fetch(blockUserId);
+                // ブロックするユーザーが自分自身か、ブロックするユーザーがVC移動権限を持っているか確認
+                return (
+                    blockUserId === userId ||
+                    member?.permissions.has(PermissionsBitField.Flags.MoveMembers) === true
+                );
             };
         } catch(error) {
             console.log(error);

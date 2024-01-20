@@ -20,14 +20,22 @@ const deleteMap = new Map<string, NodeJS.Timeout>();
 // VC作成チャンネルにアクセス -> VC作成(権限管理) -> VC移動 
 // [仕様: VCに30秒間誰もいない場合は自動削除]
 // -----------------------------------------------------------------------------------------------------------
+/**
+ * @param oldState 移動前のステータス
+ * @param newState 移動後のステータス
+ */
 module.exports = {  
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
         const newMember = newState.member;
         const oldMember = oldState.member;
+        const member = newMember ?? oldMember;
         const userName = newMember ? `${newState.member?.user.displayName}` : oldMember ? `${oldState.member?.user.displayName}` : "unknown user";
         const userId = newMember ? `${newState.member?.user.id}` : oldMember ? `${oldState.member?.user.id}` : "";
         const defaultChannelName = `自動作成-${userName}`; // デフォルトのチャンネル名
         const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
+        
+        if (!member) return; //メンバーが取得出来ない場合、処理を終了
+        
         // -----------------------------------------------------------------------------------------------------------
         // VC作成チャンネルに入った場合の処理
         // -----------------------------------------------------------------------------------------------------------
