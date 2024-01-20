@@ -17,6 +17,7 @@ export interface Config {
     inviteChannelId: string;
     voiceCreateChannelId: string;
     managementChannelId: string;
+    logChanneld: string;
     checkMarkId: string;
     uncertifiedRoleId: string;
     authenticatedRoleId: string;

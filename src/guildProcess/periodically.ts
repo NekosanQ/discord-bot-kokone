@@ -30,6 +30,6 @@ module.exports = {
             };
         } catch (error) {
             appendFile("logs/error.log", `[${date}] ${error}`);
-        }
+        };
     }
 };

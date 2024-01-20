@@ -315,7 +315,7 @@ module.exports = {
                             .join(", ");
                         replyMessage += `${errorUsersString} は既にブロックされているためブロックできませんでした。\n`;
                     };
-
+                    await editChannelPermission(channel, interaction.user);
                     await interaction.editReply({
                         content: replyMessage
                     });
@@ -345,6 +345,7 @@ module.exports = {
                             };
                         };
                     };
+                    await editChannelPermission(channel, interaction.user);
                     // リプライを送信
                     await interaction.editReply({
                         content: "選択したユーザーのブロック解除が完了しました",

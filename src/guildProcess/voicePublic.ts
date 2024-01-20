@@ -15,7 +15,6 @@ const publicChannelEmbed: EmbedBuilder = new EmbedBuilder()
 module.exports = {
 	async execute(interaction: Interaction): Promise<void> {
         if (!interaction.isButton()) return;
-        const channel = interaction.channel;
         const userName = interaction.user.displayName;
         const userId = interaction.user.id;
         const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });

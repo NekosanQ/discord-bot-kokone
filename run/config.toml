@@ -14,6 +14,8 @@ inviteChannelId = "1189556244604788768"
 voiceCreateChannelId = "1189556244604788769"
 # 運営部屋
 managementChannelId = "1189556244965490702"
+# ログ出力チャンネル
+logChannelId = "1198260142345564210"
 # チェックマーク絵文字ID
 checkMarkId = "1033764709305962506"
 # 未認証ロール
