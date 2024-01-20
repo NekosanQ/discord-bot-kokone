@@ -83,8 +83,8 @@ module.exports = {
                 });
                 return;
             };
-            let channelBitrate: number = 64;
             const channel = interaction.channel;
+            console.log(interaction.customId);
             switch (interaction.customId) {
                 // -----------------------------------------------------------------------------------------------------------
                 // チャンネルの公開
@@ -107,7 +107,7 @@ module.exports = {
                             await (interaction as StringSelectMenuInteraction).showModal(changePeopleLimitedModal);
                             break;
                         };
-                        case "Bitrate": { // ビットレート
+                        case "bitrate": { // ビットレート
                             await (interaction as StringSelectMenuInteraction).showModal(changeBitrateModal);
                             break;
                         };
@@ -119,7 +119,9 @@ module.exports = {
                 case "changeNameModal": {
                     if (!interaction.isModalSubmit()) return;
                     if (!channel) return;
-                    await interaction.deferReply({ ephemeral: true });
+                    await interaction.deferReply({ 
+                        ephemeral: true 
+                    });
                     const channelName = (interaction as ModalSubmitInteraction).fields.getTextInputValue("changeNameInput");
                     appendFile("logs/vc_create.log", `[${date}] チャンネル名を変更しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
                     await (channel as VoiceChannel).setName(channelName);
@@ -133,7 +135,9 @@ module.exports = {
                 // -----------------------------------------------------------------------------------------------------------
                 case "changePeopleLimitedModal": {
                     if (!interaction.isModalSubmit()) return;
-
+                    await interaction.deferReply({ 
+                        ephemeral: true 
+                    });
                     let channelUserLimit: number | string = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changePeopleLimitedInput"));
                     appendFile("logs/vc_create.log", `[${date}] 人数制限を変更しました: ${channelUserLimit} <実行ユーザー/ID> ${userName}/${userId}\n`);
                     if (Number.isNaN(channelUserLimit)) {
@@ -149,9 +153,8 @@ module.exports = {
                     } else {
                         await (channel as VoiceChannel).setUserLimit(channelUserLimit);
                         channelUserLimit = channelUserLimitMessage(channelUserLimit)
-                        await interaction.reply({
-                            content: `チャンネルの人数制限を${channelUserLimit}に変更しました`,
-                            ephemeral: true
+                        await interaction.editReply({
+                            content: `チャンネルの人数制限を${channelUserLimit}に変更しました`
                         });
                     };
                     break;
@@ -161,8 +164,10 @@ module.exports = {
                 // -----------------------------------------------------------------------------------------------------------
                 case "changeBitrateModal": {
                     if (!interaction.isModalSubmit()) return;
-
-                    channelBitrate = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changeBitrateInput"));
+                    await interaction.deferReply({ 
+                        ephemeral: true 
+                    });
+                    const channelBitrate = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changeBitrateInput"));
                     appendFile("logs/vc_create.log", `[${date}] ビットレートを変更しました: ${channelBitrate} <実行ユーザー/ID> ${userName}/${userId}\n`);
                     if (Number.isNaN(channelBitrate)) {
                         await interaction.reply({
@@ -176,9 +181,8 @@ module.exports = {
                         });
                     } else {
                         await (channel as VoiceChannel).setBitrate(channelBitrate * 1000);
-                        await interaction.reply({
+                        await interaction.editReply({
                             content: `チャンネルのビットレートを${channelBitrate}kbpsに変更しました`,
-                            ephemeral: true
                         });
                     };
                     break;

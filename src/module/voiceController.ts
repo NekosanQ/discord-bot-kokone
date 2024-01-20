@@ -224,11 +224,19 @@ export async function editChannelPermission(channel: VoiceBasedChannel,  ownerUs
         });
         // チャンネル権限オーバーライド
         const overwrites: OverwriteResolvable[] = [
-        ...inherit,
-        {
-            id: ownerUser,
-            allow: [allowUserPermisson, allowCreateUserPermisson],
-        },
+            ...inherit,
+            {
+                id: ownerUser,
+                allow: [allowUserPermisson, allowCreateUserPermisson],
+            },
+            {
+                id: config.authenticatedRoleId,
+                allow: [allowUserPermisson]
+            },
+            {
+                id: config.everyoneRoleId,
+                deny: [denyUserPermisson]
+            }
         ];
         // -----------------------------------------------------------------------------------------------------------
         // ブロックしているユーザーがいた場合、チャンネルを表示しない
