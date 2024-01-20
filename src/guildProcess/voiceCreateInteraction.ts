@@ -8,9 +8,19 @@ import {
     TextInputBuilder, 
     TextInputStyle, 
     VoiceChannel, 
-    PermissionsBitField, 
+    PermissionsBitField,
+    CacheType,
+    UserSelectMenuInteraction,
+    User, 
 } from "discord.js";
-import { MenuInteraction, channelSettingUpdate, channelUserLimitMessage, editChannelPermission, getChannelOwner, showBlockList } from "../module/voiceController";
+import { MenuInteraction, 
+    channelSettingUpdate, 
+    channelUserLimitMessage, 
+    editChannelPermission, 
+    getChannelOwner, 
+    transferOwnershipMenu,
+    transferOwnershipEmbed
+} from "../module/voiceController";
 import { config } from "../utils/config";
 import { PrismaClient } from "@prisma/client";
 import { appendFile } from "../module/file/appedFile";
@@ -19,6 +29,10 @@ const prisma = new PrismaClient();
 const editChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
     .setTitle("ボイスチャンネルの設定を変更しました")
+    .setDescription("設定を行いたい場合、下のメニューから設定を行ってください。")
+const editBlockEmbed: EmbedBuilder = new EmbedBuilder()
+    .setColor(Number(config.botColor))
+    .setTitle("ブロックするユーザーの設定を変更しました")
     .setDescription("設定を行いたい場合、下のメニューから設定を行ってください。")
 
 const changeNameModal: ModalBuilder = new ModalBuilder()
@@ -83,13 +97,13 @@ module.exports = {
                 });
                 return;
             };
-            const channel = interaction.channel;
-            console.log(interaction.customId);
+            const channel = interaction.channel as VoiceChannel;
             switch (interaction.customId) {
                 // -----------------------------------------------------------------------------------------------------------
                 // チャンネルの公開
                 // -----------------------------------------------------------------------------------------------------------
-                case "publicButton": {
+                case "publicButton":
+                case "confirmationButton": {
                     await require("../guildProcess/voicePublic").execute(interaction);
                     break;
                 };
@@ -97,21 +111,32 @@ module.exports = {
                 // チャンネルの設定
                 // -----------------------------------------------------------------------------------------------------------
                 case "operationMenu": {
-                    const operationPage = (interaction as StringSelectMenuInteraction).values[0].split("_")[0];
+                    if (!interaction.isStringSelectMenu()) return;
+                    const operationPage = interaction.values[0].split("_")[0];
                     switch (operationPage) {
                         case "name": { // 名前
-                            await (interaction as StringSelectMenuInteraction).showModal(changeNameModal);
+                            await interaction.showModal(changeNameModal);
                             break;
                         };
                         case "peopleLimited": { // 人数制限
-                            await (interaction as StringSelectMenuInteraction).showModal(changePeopleLimitedModal);
+                            await interaction.showModal(changePeopleLimitedModal);
                             break;
                         };
                         case "bitrate": { // ビットレート
-                            await (interaction as StringSelectMenuInteraction).showModal(changeBitrateModal);
+                            await interaction.showModal(changeBitrateModal);
                             break;
                         };
+                        case "owner": {
+                            // VCのオーナーの変更
+                            await interaction.reply({
+                                embeds: [transferOwnershipEmbed],
+                                components: [transferOwnershipMenu],
+                                ephemeral: true
+                            });
+                            break;
+                        }
                     };
+                    break;
                 }
                 // -----------------------------------------------------------------------------------------------------------
                 // チャンネル名の変更
@@ -124,7 +149,7 @@ module.exports = {
                     });
                     const channelName = (interaction as ModalSubmitInteraction).fields.getTextInputValue("changeNameInput");
                     appendFile("logs/vc_create.log", `[${date}] チャンネル名を変更しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
-                    await (channel as VoiceChannel).setName(channelName);
+                    await channel.setName(channelName);
                     await interaction.editReply({
                         content: `チャンネルの名前を${channelName}に変更しました`
                     });
@@ -151,7 +176,7 @@ module.exports = {
                             ephemeral: true
                         });
                     } else {
-                        await (channel as VoiceChannel).setUserLimit(channelUserLimit);
+                        await (channel ).setUserLimit(channelUserLimit);
                         channelUserLimit = channelUserLimitMessage(channelUserLimit)
                         await interaction.editReply({
                             content: `チャンネルの人数制限を${channelUserLimit}に変更しました`
@@ -180,12 +205,67 @@ module.exports = {
                             ephemeral: true
                         });
                     } else {
-                        await (channel as VoiceChannel).setBitrate(channelBitrate * 1000);
+                        await (channel ).setBitrate(channelBitrate * 1000);
                         await interaction.editReply({
                             content: `チャンネルのビットレートを${channelBitrate}kbpsに変更しました`,
                         });
                     };
                     break;
+                };
+                // -----------------------------------------------------------------------------------------------------------
+                // VCの譲渡
+                // -----------------------------------------------------------------------------------------------------------
+                case "transferOwnership": {
+                    if (!interaction.isUserSelectMenu()) return;
+                    // 譲渡先のユーザーを取得
+                    const newOwnerId: string = String(interaction.values[0]);
+                    const newOwner = await interaction.guild?.members.fetch(newOwnerId);
+                    if (!newOwner) {
+                        await interaction.reply({
+                            content: "ユーザーが見つかりませんでした",
+                            ephemeral: true,
+                        });
+                        return;
+                    };
+                    // 譲渡先がBotでないか確認
+                    if (newOwner.user.bot) {
+                        await interaction.reply({
+                            content: "Botをオーナーにすることはできません",
+                            ephemeral: true,
+                        });
+                        return;
+                    };
+                    if (!channel) return;
+
+                    // 譲渡先が自分自身の場合かつ、オーナーが既に自分の場合
+                    if (newOwner.id === interaction.user.id && newOwner === getChannelOwner(channel)) {
+                        await interaction.reply({
+                            content: "既にあなたがオーナーです",
+                            ephemeral: true,
+                        });
+                        return;
+                    };
+
+                    // 譲渡先のユーザーがVCに入っているか確認
+                    if (newOwner.voice.channelId !== channel.id) {
+                        await interaction.reply({
+                            content: "譲渡先のユーザーが同じVCに入っていません",
+                            ephemeral: true,
+                        });
+                        return;
+                    };
+
+                    await interaction.deferReply({ ephemeral: true });
+
+                    // チャンネルのオーナーを変更
+                    await editChannelPermission(channel, newOwner.user);
+
+                    // リプライを送信
+                    await interaction.editReply({
+                        content: `<@${newOwner.id}> にVCのオーナーを譲渡しました`,
+                    });
+
+                    return;
                 };
                 // -----------------------------------------------------------------------------------------------------------
                 // ユーザーのブロック
@@ -221,20 +301,21 @@ module.exports = {
                         };
                     };
                     const blockedUserNum = selectedMemberNum - privilegedUsers.length - alreadyBlockedUsers.length; // ブロック出来るユーザーの数
-                    let replyMessage = `選択した${selectedMemberNum}人${selectedMemberNum === blockedUserNum ? '' : `の内${blockedUserNum}人`}のユーザーのブロックが完了しました。\n`;
+                    let replyMessage = `選択した${selectedMemberNum}人${selectedMemberNum === blockedUserNum ? "" : `の内${blockedUserNum}人`}のユーザーのブロックが完了しました。\n`;
                     if (blockedUserNum == 0) {
                         replyMessage = `全員のブロックをする事が出来ませんでした`;
                     } else if (privilegedUsers.length > 0) {
                         const errorUsersString = privilegedUsers
                             .map((userId) => `<@${userId}>`)
-                            .join(', ');
+                            .join(", ");
                          replyMessage += `${errorUsersString} はブロックできませんでした。\n`;
                     } else if (alreadyBlockedUsers.length > 0) {
                         const errorUsersString = alreadyBlockedUsers
                             .map((userId) => `<@${userId}>`)
-                            .join(', ');
+                            .join(", ");
                         replyMessage += `${errorUsersString} は既にブロックされているためブロックできませんでした。\n`;
-                    }
+                    };
+
                     await interaction.editReply({
                         content: replyMessage
                     });
@@ -266,7 +347,7 @@ module.exports = {
                     };
                     // リプライを送信
                     await interaction.editReply({
-                        content: '選択したユーザーのブロック解除が完了しました',
+                        content: "選択したユーザーのブロック解除が完了しました",
                     });
                     break;
                 };

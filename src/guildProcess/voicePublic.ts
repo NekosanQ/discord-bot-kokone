@@ -2,12 +2,10 @@ import { ButtonInteraction, EmbedBuilder, Interaction, VoiceBasedChannel, VoiceC
 import { config } from "../utils/config";
 import { appendFile } from "../module/file/appedFile";
 import { 
-    operationMenu, 
-    allowUserPermisson, 
-    allowCreateUserPermisson,
-    denyUserPermisson, 
-} from "../module/voiceCreateData";
-import { PrismaClient } from "@prisma/client"
+    blockSettingUpdate,
+    confirmationButton,
+    operationMenu, settingBlockEmbed, userBlockListMenu, userBlockReleaseListMenu, 
+} from "../module/voiceController";
 import { channelSettingUpdate, editChannelPermission, getChannelOwner } from "../module/voiceController";
 
 const publicChannelEmbed: EmbedBuilder = new EmbedBuilder()
@@ -22,11 +20,11 @@ module.exports = {
         const userId = interaction.user.id;
         const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
         // -----------------------------------------------------------------------------------------------------------
-        // チャンネルを公開する時の処理
+        // チャンネルを公開する・した後のボタン処理
         // -----------------------------------------------------------------------------------------------------------
-        if (interaction.customId === "publicButton") {
-            try {
-                if (channel && channel.type === 2) { // チャンネルがボイスチャンネルかどうか確認
+        try {
+            switch (interaction.customId) {
+                case "publicButton": {
                     const channel = interaction.channel as VoiceBasedChannel;
                     await interaction.deferReply({ 
                         ephemeral: true 
@@ -43,12 +41,21 @@ module.exports = {
                         embeds: [
                             publicChannelEmbed.setFields(await channelSettingUpdate(interaction))
                         ],
-                        components: [operationMenu]
+                        components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, confirmationButton]
                     });
+                    break
                 };
-            } catch(error) {
-                console.log(error);
-            };
+                case "confirmationButton": {
+                    await interaction.reply({
+                        embeds: [
+                            settingBlockEmbed.setFields(await blockSettingUpdate(interaction))
+                        ],
+                        ephemeral: true,
+                    });
+                }
+            }
+        } catch(error) {
+            console.log(error);
         };
     }
 };

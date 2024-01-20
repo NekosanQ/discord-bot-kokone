@@ -1,16 +1,13 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 import {
     EmbedBuilder,
     ActionRowBuilder,
     ModalSubmitInteraction,
     StringSelectMenuInteraction,
-    TextInputBuilder,
-    TextInputStyle,
     UserSelectMenuInteraction,
     OverwriteResolvable,
     VoiceBasedChannel,
     User,
-    APIEmbedField,
     ButtonInteraction,
     UserSelectMenuBuilder,
     ButtonBuilder,
@@ -19,14 +16,13 @@ import {
     ButtonStyle,
     OverwriteType,
     GuildMember,
-    Channel,
     ModalBuilder,
     VoiceChannel
-} from 'discord.js';
+} from "discord.js";
 
-import { config } from '../utils/config.js';
+import { config } from "../utils/config.js";
 
-import { client } from '../index.js';
+import { client } from "../index.js";
 
 /**
  * データベースのインスタンス
@@ -47,6 +43,13 @@ export const settingChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
     .setTitle("ボイスチャンネルの設定")
     .setDescription("二段階認証をしている場合、手動でチャンネルの設定やボイスチャットメンバーへのミュートなどが行えます。\n二段階認証していない場合、BOTからチャンネルの設定を行う事が出来ます\n※引き継がれるのはブロックしているユーザー・ロールのみです。チャンネル名などは引き継がれません。")
+/**
+ * ブロック設定時に送る埋め込みメッセージ
+ */
+export const settingBlockEmbed: EmbedBuilder = new EmbedBuilder()
+    .setColor(Number(config.botColor))
+    .setTitle("ブロックユーザー一覧")
+    .setDescription("設定を行いたい場合、設定画面のメニューから設定を行ってください。")
 /**
  * ブロックするユーザーを選択するためのセレクトメニュー
  */
@@ -91,7 +94,12 @@ export const operationMenu: ActionRowBuilder<StringSelectMenuBuilder> = new Acti
                 label: "ビットレート",
                 description: "ビットレート(音質)を変更できます(8~384)",
                 value: "bitrate_change"
-            }
+            },
+            {
+                label: "VCのオーナーの変更",
+                description: "VCの管理権限を他の人に渡します",
+                value: "owner_change"
+            },
         )
 );
 /**
@@ -104,17 +112,36 @@ export const publicButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilde
             .setLabel("ボイスチャンネルを公開する")
             .setStyle(ButtonStyle.Success)
     )
-    const changeNameInput: TextInputBuilder = new TextInputBuilder()
-    .setMaxLength(20)
-    .setMinLength(1)
-    .setCustomId("changeNameInput")
-    .setLabel("変更するチャンネル名を入力してください")
-    .setPlaceholder("20文字までです")
-    .setStyle(TextInputStyle.Short)
-
-const changePeopleLimitedModal: ModalBuilder = new ModalBuilder()
-    .setCustomId("changePeopleLimitedModal")
-    .setTitle("人数制限の変更")
+/**
+ * ブロックしているユーザーを確認するためのボタン
+ */
+export const confirmationButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
+    .addComponents(
+        new ButtonBuilder()
+            .setCustomId("confirmationButton")
+            .setLabel("ブロックユーザーを確認する")
+            .setStyle(ButtonStyle.Success)
+    )
+/**
+ * VCのオーナーの変更を行う際のモーダル
+ */
+export const transferOwnershipEmbed: EmbedBuilder = new EmbedBuilder()
+    .setColor(Number(config.botColor))
+    .setTitle("VCのオーナーの変更")
+    .setDescription(
+        "他の人にVCの管理権限を渡します\n設定を行いたい場合、下のメニューから設定を行ってください。",
+    );
+/**
+ * 譲渡するユーザーを選択するためのセレクトメニュー
+ */
+export const transferOwnershipMenu: ActionRowBuilder<UserSelectMenuBuilder> =
+    new ActionRowBuilder<UserSelectMenuBuilder>().setComponents(
+        new UserSelectMenuBuilder()
+            .setCustomId("transferOwnership")
+            .setPlaceholder("VCの管理権限を譲渡するユーザーを選択")
+            .setMaxValues(1)
+            .setMinValues(1),
+    );
 /**
  * ボイスチャンネルを使用するユーザーの権限
  */
@@ -178,7 +205,7 @@ export function getChannelOwner(channel: VoiceBasedChannel): GuildMember | undef
     return channel.guild.members.resolve(ownerUser.id) ?? undefined;
 };
 /**
- * 
+ * ユーザー人数制限のメッセージを変更する
  * @param channelUserLimit ユーザー人数制限
  * @returns 
  */
@@ -187,6 +214,7 @@ export function channelUserLimitMessage(channelUserLimit: number | string) {
     return channelUserLimit
 };
 /**
+ * 埋め込みメッセージの設定フィールドを作成する
 * @returns 埋め込みメッセージの設定フィールドを返す
 */
 export async function channelSettingUpdate(interaction: MenuInteraction) {
@@ -195,7 +223,7 @@ export async function channelSettingUpdate(interaction: MenuInteraction) {
     let channelUserLimit: string | number = (interaction.channel as VoiceChannel)?.userLimit;
     channelUserLimit = channelUserLimitMessage(channelUserLimit);
     const embedFielsArray = [];
-    const voiceCreateComponents = interaction.message?.components.length; // 設定メッセージのコンポーネントの数を取得
+    const buttonComponentName = interaction.message?.components[3].components[0].customId; // ボタンのcustomIdを取得
     const settingChannelObject = {
         name: "現在の設定", 
         value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitrate}kbps` 
@@ -205,10 +233,19 @@ export async function channelSettingUpdate(interaction: MenuInteraction) {
         name: "ブロックしているユーザー",
         value: blockUserListValue
     }
-    voiceCreateComponents === 4 ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
+    //公開してなかったらブロックしているユーザーの情報も追加する
+    buttonComponentName === "publicButton" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
     
     return embedFielsArray;
 };
+export async function blockSettingUpdate(interaction: UserSelectMenuInteraction | ButtonInteraction) {
+    const blockUserListValue = await showBlockList(interaction, interaction.user.id);
+    const blockUserListObject = {
+        name: "ブロックしているユーザー",
+        value: blockUserListValue
+    }
+    return blockUserListObject;
+}
 /**
  * チャンネルの権限設定を更新する
  * @param channel チャンネル
@@ -281,22 +318,7 @@ export async function showBlockList(interaction: MenuInteraction, user: string) 
     });
     // ブロックしているユーザーリストの文字列を作成
     const blockUserList: string = allUsers.length > 0
-        ? allUsers.map((user: { block_user_id: any; }) => `<@${user.block_user_id}>`).join('\n')
-        : 'なし';
+        ? allUsers.map((user: { block_user_id: any; }) => `<@${user.block_user_id}>`).join("\n")
+        : "なし";
     return blockUserList;
-};
-
-/**
- * ボタンが押されたときの処理
- * @param interaction インタラクション
- * @param operationPage ページ
- */
-export async function onOperationMenu(interaction: StringSelectMenuInteraction, operationPage: string): Promise<void> {
-    switch (operationPage) {
-        case 'peopleLimited_change': {
-            // 人数制限
-            await interaction.showModal(changePeopleLimitedModal);
-            break;
-        };
-    };
 };

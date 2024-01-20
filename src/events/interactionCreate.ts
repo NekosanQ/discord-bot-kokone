@@ -18,8 +18,9 @@ module.exports = {
 			commandName = interaction.customId.split("_")[1];
 		} else {
 			commandName = ""
-		}
+		};
 		const command: CustomCommand | undefined = interaction.client.commands.get(commandName);
+		console.log(command);
 		if (command) {
 			try {
 				await command.execute(interaction);

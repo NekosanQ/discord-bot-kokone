@@ -9,7 +9,7 @@ import {
     allowUserPermisson, 
     denyUserPermisson,
     allowCreateUserPermisson, 
-} from "../module/voiceCreateData";
+} from "../module/voiceController";
 import { PrismaClient } from "@prisma/client"
 import { config } from "../utils/config";
 const prisma = new PrismaClient();
@@ -69,9 +69,8 @@ module.exports = {
                     } else {
                         channelUserLimit = `${channelUserLimit}人`
                     }
-                    const channelBitRate = Number(newState.channel?.bitrate) / 1000;
+                    const channelBitrate = Number(newState.channel?.bitrate) / 1000;
                     let blockUserList = "なし";
-
                     const allUsers = await prisma.blockLists.findMany({
                         where: {
                             user_id: String(newMember?.id)
@@ -83,13 +82,12 @@ module.exports = {
                     };
                     newVoiceChannel.send({ // 移動が成功したらメッセージを送信
                         content: `<@${userId}>`,
-                        embeds: [createChannelEmbed
-                            .setFields(
-                                { name: "現在の設定", value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitRate}kbps`},
+                        embeds: [createChannelEmbed.setFields(
+                                { name: "現在の設定", value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitrate}kbps`},
                                 { name: "ブロックしているユーザー", value: blockUserList}
                             )
                         ],
-                        components: [userBlockListMenu, userBlockReleaseListMenu, operationMenu, publicButton]
+                        components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, publicButton]
                     });
                 })
                 .catch((error: Error) => {
