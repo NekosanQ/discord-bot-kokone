@@ -24,13 +24,25 @@ module.exports = {
                         });
                     };
                 };
-                const messages = await interaction.channel?.messages.fetch({ limit: 1 });
+                // チャンネルを取得
+                const channel = interaction.channel;
+
+                // チャンネルのメッセージを取得
+                const messages = await channel?.messages.fetch();
+
                 if (!messages) return;
-                const firstMessage = messages.first();
-                if (!firstMessage) return;
+                // メッセージをID順にソート
+                const sortedMessages = messages.sort((a, b) => Number(a.id) - Number(b.id));
+
+                // 最初のメッセージを取得
+                const firstMessage = sortedMessages.first();
+
+                if(!firstMessage) return;
+                // メッセージのリンクを返信
                 await interaction.reply({
-                    content: `https://discord.com/channels/${interaction.guild?.id}/${interaction.channel?.id}/${firstMessage.id}`
+                    content: `https://discord.com/channels/${interaction.guild?.id}/${channel?.id}/${firstMessage.id}`
                 });
+
             };
         } catch(error) {
             console.log(error);

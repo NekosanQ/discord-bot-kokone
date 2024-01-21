@@ -20,7 +20,6 @@ module.exports = {
 			commandName = ""
 		};
 		const command: CustomCommand | undefined = interaction.client.commands.get(commandName);
-		console.log(command);
 		if (command) {
 			try {
 				await command.execute(interaction);

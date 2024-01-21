@@ -34,6 +34,8 @@ module.exports = {
 
         logger.info(`[入室通知] <入室ユーザー表示名/名前/ID>: ${member.displayName}/${member.user.username}/${member.id}`);
 
+        await member.roles.add(config.uncertifiedRoleId);
+
         if (getEntranceChannelId) { // 入退室チャンネルに送信
             await (getEntranceChannelId as TextChannel).send({
                 embeds: [welcomeMessageEmbed.entrance]

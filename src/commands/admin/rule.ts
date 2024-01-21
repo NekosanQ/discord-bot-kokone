@@ -33,11 +33,13 @@ module.exports = {
             try {
                 const role: boolean = interaction.member.roles.cache.has(config.uncertifiedRoleId);
                 if (role) {
+                    await interaction.deferReply({ 
+                        ephemeral: true 
+                    });
                     await interaction.member.roles.remove(config.uncertifiedRoleId);
-                    await interaction.member.roles.add(config.uncertifiedRoleId);
-                    await interaction.reply({
-                        embeds: [embeds.completed],
-                        ephemeral: true,
+                    await interaction.member.roles.add(config.authenticatedRoleId);
+                    await interaction.editReply({
+                        embeds: [embeds.completed]
                     });
                     logger.info(`利用規約に同意しました <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}`);
                     appendFile("logs/rule.log", `[${date}] 利用規約に同意しました <実行ユーザー/ID>: <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
