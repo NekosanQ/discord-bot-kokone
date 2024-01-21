@@ -22,6 +22,7 @@ module.exports = {
                             content: "作成したVC以外では実行できません",
                             ephemeral: true
                         });
+                        return;
                     };
                 };
                 // チャンネルを取得

@@ -8,10 +8,11 @@
             "type": "node",
             "request": "launch",
             "name": "プログラムの起動",
+            "program": "${workspaceFolder}/src/index.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\dist\\index.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],

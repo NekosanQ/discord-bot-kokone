@@ -1,17 +1,24 @@
-import { ButtonInteraction, EmbedBuilder, Interaction, VoiceBasedChannel, VoiceChannel } from "discord.js";
+import { ButtonInteraction, EmbedBuilder, GuildMember, Interaction, PermissionsBitField, VoiceBasedChannel, VoiceChannel } from "discord.js";
 import { config } from "../utils/config";
 import { appendFile } from "../module/file/appedFile";
 import { 
     blockSettingUpdate,
     confirmationButton,
-    operationMenu, settingBlockEmbed, userBlockListMenu, userBlockReleaseListMenu, 
+    operationMenu, 
+    settingBlockEmbed, 
+    userBlockListMenu, 
+    userBlockReleaseListMenu, 
 } from "../module/voiceController";
 import { channelSettingUpdate, editChannelPermission, getChannelOwner } from "../module/voiceController";
 
+const commandChannelEmbed: EmbedBuilder = new EmbedBuilder()
+    .setColor(Number(config.botColor))
+    .setTitle("ボイスチャンネルの設定")
+    .setDescription("設定を行いたい場合、下のメニューから設定を行ってください\nボイスチャンネルの公開はVCチャットから行ってください")
 const publicChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
     .setTitle("ボイスチャンネルを公開しました")
-    .setDescription("設定を行いたい場合、下のメニューから設定を行ってください\n※ブロック・ブロック解除の操作は行えません")
+    .setDescription("設定を行いたい場合、下のメニューから設定を行ってください")
 module.exports = {
 	async execute(interaction: Interaction): Promise<void> {
         if (!interaction.isButton()) return;
@@ -24,7 +31,8 @@ module.exports = {
         try {
             switch (interaction.customId) {
                 case "publicButton": {
-                    const channel = interaction.channel as VoiceBasedChannel;
+                    const channel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
+                    if(!channel) return;
                     await interaction.deferReply({ 
                         ephemeral: true 
                     });
@@ -43,6 +51,19 @@ module.exports = {
                         components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, confirmationButton]
                     });
                     break
+                };
+                case "startButton": {
+                    const voiceChannel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
+                    if (!voiceChannel) return;
+                    const permissionOverwrites = voiceChannel.permissionOverwrites.cache.get(config.authenticatedRoleId);
+
+                    await interaction.update({
+                        embeds: [
+                            commandChannelEmbed.setFields(await channelSettingUpdate(interaction))
+                        ],
+                        components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, confirmationButton]
+                    });
+                    break;
                 };
                 case "confirmationButton": {
                     await interaction.reply({

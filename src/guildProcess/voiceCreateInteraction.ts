@@ -11,7 +11,8 @@ import {
     PermissionsBitField,
     CacheType,
     UserSelectMenuInteraction,
-    User, 
+    User,
+    GuildMember, 
 } from "discord.js";
 import { MenuInteraction, 
     channelSettingUpdate, 
@@ -97,12 +98,14 @@ module.exports = {
                 });
                 return;
             };
-            const channel = interaction.channel as VoiceChannel;
+            const channel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
+            if(!channel) return;
             switch (interaction.customId) {
                 // -----------------------------------------------------------------------------------------------------------
-                // チャンネルの公開
+                // チャンネルの公開/設定の開始
                 // -----------------------------------------------------------------------------------------------------------
                 case "publicButton":
+                case "startButton":
                 case "confirmationButton": {
                     await require("../guildProcess/voicePublic").execute(interaction);
                     break;
@@ -143,18 +146,20 @@ module.exports = {
                 // -----------------------------------------------------------------------------------------------------------
                 case "changeNameModal": {
                     if (!interaction.isModalSubmit()) return;
-                    if (!channel) return;
+                    const voiceChannel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
+                    if (!voiceChannel) return;
                     await interaction.deferReply({ 
                         ephemeral: true 
                     });
                     const channelName = (interaction as ModalSubmitInteraction).fields.getTextInputValue("changeNameInput");
                     appendFile("logs/vc_create.log", `[${date}] チャンネル名を変更しました: ${channelName} <実行ユーザー/ID> ${userName}/${userId}\n`);
-                    await channel.setName(channelName);
+                    await voiceChannel.setName(channelName);
                     await interaction.editReply({
                         content: `チャンネルの名前を${channelName}に変更しました`
                     });
                     break;
                 };
+                
                 // -----------------------------------------------------------------------------------------------------------
                 // 人数制限の変更
                 // -----------------------------------------------------------------------------------------------------------
@@ -163,6 +168,8 @@ module.exports = {
                     await interaction.deferReply({ 
                         ephemeral: true 
                     });
+                    const voiceChannel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
+                    if (!voiceChannel) return;
                     let channelUserLimit: number | string = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changePeopleLimitedInput"));
                     appendFile("logs/vc_create.log", `[${date}] 人数制限を変更しました: ${channelUserLimit} <実行ユーザー/ID> ${userName}/${userId}\n`);
                     if (Number.isNaN(channelUserLimit)) {
@@ -176,7 +183,7 @@ module.exports = {
                             ephemeral: true
                         });
                     } else {
-                        await (channel ).setUserLimit(channelUserLimit);
+                        await voiceChannel.setUserLimit(channelUserLimit);
                         channelUserLimit = channelUserLimitMessage(channelUserLimit)
                         await interaction.editReply({
                             content: `チャンネルの人数制限を${channelUserLimit}に変更しました`
@@ -192,6 +199,8 @@ module.exports = {
                     await interaction.deferReply({ 
                         ephemeral: true 
                     });
+                    const voiceChannel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
+                    if (!voiceChannel) return;
                     const channelBitrate = Number((interaction as ModalSubmitInteraction).fields.getTextInputValue("changeBitrateInput"));
                     appendFile("logs/vc_create.log", `[${date}] ビットレートを変更しました: ${channelBitrate} <実行ユーザー/ID> ${userName}/${userId}\n`);
                     if (Number.isNaN(channelBitrate)) {
@@ -205,7 +214,7 @@ module.exports = {
                             ephemeral: true
                         });
                     } else {
-                        await (channel ).setBitrate(channelBitrate * 1000);
+                        await voiceChannel.setBitrate(channelBitrate * 1000);
                         await interaction.editReply({
                             content: `チャンネルのビットレートを${channelBitrate}kbpsに変更しました`,
                         });

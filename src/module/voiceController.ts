@@ -217,25 +217,36 @@ export function channelUserLimitMessage(channelUserLimit: number | string) {
  * 埋め込みメッセージの設定フィールドを作成する
 * @returns 埋め込みメッセージの設定フィールドを返す
 */
-export async function channelSettingUpdate(interaction: MenuInteraction) {
-    const channelName = (interaction.channel as VoiceChannel).name;
-    const channelBitrate = Number((interaction.channel as VoiceChannel)?.bitrate) / 1000;
-    let channelUserLimit: string | number = (interaction.channel as VoiceChannel)?.userLimit;
-    channelUserLimit = channelUserLimitMessage(channelUserLimit);
-    const embedFielsArray = [];
-    const buttonComponentName = interaction.message?.components[3].components[0].customId; // ボタンのcustomIdを取得
-    const settingChannelObject = {
-        name: "現在の設定", 
-        value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitrate}kbps` 
-    };
-    const blockUserListValue = await showBlockList(interaction, interaction.user.id);
-    const blockUserListObject = {
-        name: "ブロックしているユーザー",
-        value: blockUserListValue
+export async function channelSettingUpdate(interaction: MenuInteraction): Promise<{ name: string; value: string; }[]> {
+    // ユーザーが接続しているボイスチャンネルを取得
+    const voiceChannel = interaction.member instanceof GuildMember ? interaction.member.voice.channel : null;
+    if (!voiceChannel) {
+        return []; // ユーザーがボイスチャンネルに接続していない場合は空の配列を返す
     }
-    //公開してなかったらブロックしているユーザーの情報も追加する
-    buttonComponentName === "publicButton" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
-    
+
+    const channelName = voiceChannel.name;
+    const channelBitrate = Number(voiceChannel.bitrate) / 1000;
+    let channelUserLimit: string | number = voiceChannel.userLimit;
+    channelUserLimit = channelUserLimitMessage(channelUserLimit);
+
+    const embedFielsArray = [];
+    if (interaction.message) {
+        const buttonComponentName = interaction.message?.components.length > 2 
+        ? interaction.message?.components[3].components[0].customId // ボタンのcustomIdを取得
+        : interaction.message?.components[0].components[0].customId; // ボタンのcustomIdを取得
+
+        const settingChannelObject = {
+            name: "現在の設定", 
+            value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitrate}kbps` 
+        };
+        const blockUserListValue = await showBlockList(interaction, interaction.user.id);
+        const blockUserListObject = {
+            name: "ブロックしているユーザー",
+            value: blockUserListValue
+        }
+        //公開してなかったらブロックしているユーザーの情報も追加する
+        buttonComponentName === "publicButton" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
+    }
     return embedFielsArray;
 };
 export async function blockSettingUpdate(interaction: UserSelectMenuInteraction | ButtonInteraction) {
