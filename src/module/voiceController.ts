@@ -222,7 +222,7 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
     const voiceChannel = interaction.member instanceof GuildMember ? interaction.member.voice.channel : null;
     if (!voiceChannel) {
         return []; // ユーザーがボイスチャンネルに接続していない場合は空の配列を返す
-    }
+    };
 
     const channelName = voiceChannel.name;
     const channelBitrate = Number(voiceChannel.bitrate) / 1000;
@@ -243,10 +243,10 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
         const blockUserListObject = {
             name: "ブロックしているユーザー",
             value: blockUserListValue
-        }
+        };
         //公開してなかったらブロックしているユーザーの情報も追加する
         buttonComponentName === "publicButton" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
-    }
+    };
     return embedFielsArray;
 };
 export async function blockSettingUpdate(interaction: UserSelectMenuInteraction | ButtonInteraction) {

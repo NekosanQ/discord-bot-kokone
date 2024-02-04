@@ -91,15 +91,16 @@ module.exports = {
         const userId: string = String(interaction.user.id);
         try {
             if (!interaction.isButton() && !interaction.isStringSelectMenu() && !interaction.isModalSubmit() && !interaction.isUserSelectMenu()) return;
-            if (!interaction.memberPermissions?.has(PermissionsBitField.Flags.ManageChannels)) {
+            const channel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
+            if(!channel) return;
+            const permissionOverwrites = channel.permissionOverwrites.cache.get(interaction.user.id);
+            if (permissionOverwrites && !permissionOverwrites.allow.has(PermissionsBitField.Flags.ManageChannels)) {
                 await interaction.reply({
                     content: "あなたにはチャンネルの設定をする権限がありません",
                     ephemeral: true
                 });
                 return;
             };
-            const channel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
-            if(!channel) return;
             switch (interaction.customId) {
                 // -----------------------------------------------------------------------------------------------------------
                 // チャンネルの公開/設定の開始

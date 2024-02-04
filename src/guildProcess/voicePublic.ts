@@ -55,7 +55,6 @@ module.exports = {
                 case "startButton": {
                     const voiceChannel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
                     if (!voiceChannel) return;
-                    const permissionOverwrites = voiceChannel.permissionOverwrites.cache.get(config.authenticatedRoleId);
 
                     await interaction.update({
                         embeds: [
