@@ -32,38 +32,15 @@ module.exports = {
                 await interaction.deferReply({ 
                     ephemeral: false
                 });
-                /**
-                 * @param channel ボイスチャンネル
-                 * @returns 一番最初のメッセージ
-                 */
-                async function fetchFirstMessage(channel: VoiceChannel): Promise<Message> {
-                    let lastID;
-                    let messages;
-
-                    while (true) {
-                        messages = await channel.messages.fetch({ 
-                            limit: 100,
-                            before: lastID 
-                        });
-                        if (messages.size === 0) break;
-                        lastID = messages.last()?.id;
-                    };
-
-                    if (lastID) {
-                        return await channel.messages.fetch(lastID);
-                    } else {
-                        throw new Error('No messages found in channel');
-                    };
-                };
-
-                // 最初のメッセージを取得
-                const firstMessage = await fetchFirstMessage(channel);
-
-                if(!firstMessage) return;
-                // メッセージのリンクを返信
-                await interaction.editReply({
-                    content: `https://discord.com/channels/${interaction.guild?.id}/${channel?.id}/${firstMessage.id}`
-                });
+                channel.messages.fetch({ after: '0', limit: 1 }) // メッセージが送信されたチャンネルで一番最初に送信されたメッセージを取得する
+                    .then(messages => 
+                        messages.first()
+                    ) // コレクションからメッセージが送信されたチャンネルで一番最初に送信されたメッセージを取り出す
+                    .then(message => // 一番最初に送信されたメッセージのURLを送信する
+                        interaction.editReply({
+                            content: message?.url
+                        })
+                    )
             };
         } catch(error) {
             console.log(error);
