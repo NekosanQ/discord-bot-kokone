@@ -33,14 +33,6 @@ module.exports = {
         const messageRole: Collection<string, Role> = message.mentions.roles; // メッセージに含まれているメンションを取得
         if (message.channel.id == config.inviteChannelId && message.content.match("@")) {
             const voiceChannel = message.member?.voice.channel;
-            if (!voiceChannel) {
-                const errorMessage: string = "ボイスチャンネルにいないユーザーのメンションを検出しました";
-                appendFile("logs/violation.log", `[${date}] ${errorMessage} <違反ユーザー/ID>: <違反ユーザー表示名/名前/ID>: ${message.author.displayName}/${message.author.username}/${message.author.id}\n`);
-                const errorMessageSend: Message = await message.channel.send(`${errorMessage}`);
-                await message.delete();
-                await setTimeout(10000);
-                await errorMessageSend.delete();
-            }
             try {
                 let inviteMentionCount: number = 0; // 募集通知カウント
                 for (let key of messageRole.keys()) { // メンションの数だけ繰り返す
@@ -66,7 +58,17 @@ module.exports = {
                     await message.delete();
                     await setTimeout(10000);
                     await errorMessageSend.delete();
+                    return;
                 };  
+                if (!voiceChannel) {
+                    const errorMessage: string = "ボイスチャンネルにいないユーザーのメンションを検出しました";
+                    appendFile("logs/violation.log", `[${date}] ${errorMessage} <違反ユーザー/ID>: <違反ユーザー表示名/名前/ID>: ${message.author.displayName}/${message.author.username}/${message.author.id}\n`);
+                    const errorMessageSend: Message = await message.channel.send(`${errorMessage}`);
+                    await message.delete();
+                    await setTimeout(10000);
+                    await errorMessageSend.delete();
+                    return;
+                }
             } catch (error) {
                 appendFile("logs/error.log", `[${date}] ${error}`);
             };
