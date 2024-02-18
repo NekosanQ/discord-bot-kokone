@@ -125,14 +125,14 @@ module.exports = {
             try {
                 for (let i = 0; i < config.defaultVoiceChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
                     if (config.defaultVoiceChannelList[i] === newState.channelId) return;
-                };
+                }
                 if (deleteMap.has(newState.channel?.id!)) { // マップに予約がある場合
                     clearTimeout(deleteMap.get(newState.channel?.id!)); // 予約をキャンセル
                     deleteMap.delete(newState.channel?.id!);
-                };
+                }
             } catch (error) {
                 console.log(error);
             }
         }
-    },
+    }
 };
