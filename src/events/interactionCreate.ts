@@ -18,7 +18,7 @@ module.exports = {
 			commandName = interaction.customId.split("_")[1];
 		} else {
 			commandName = ""
-		};
+		}
 		const command: CustomCommand | undefined = interaction.client.commands.get(commandName);
 		if (command) {
 			try {
@@ -34,5 +34,5 @@ module.exports = {
 				console.log(error);
 			}
 		}
-	},
+	}
 };
