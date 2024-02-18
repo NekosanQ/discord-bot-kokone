@@ -203,7 +203,7 @@ export function getChannelOwner(channel: VoiceBasedChannel): GuildMember | undef
     );
     if (!ownerUser) return undefined;
     return channel.guild.members.resolve(ownerUser.id) ?? undefined;
-};
+}
 /**
  * ユーザー人数制限のメッセージを変更する
  * @param channelUserLimit ユーザー人数制限
@@ -211,8 +211,8 @@ export function getChannelOwner(channel: VoiceBasedChannel): GuildMember | undef
  */
 export function channelUserLimitMessage(channelUserLimit: number | string) {
     channelUserLimit = channelUserLimit === 0 ? "無制限" : `${channelUserLimit}人`;
-    return channelUserLimit
-};
+    return channelUserLimit;
+}
 /**
  * 埋め込みメッセージの設定フィールドを作成する
 * @returns 埋め込みメッセージの設定フィールドを返す
@@ -222,7 +222,7 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
     const voiceChannel = interaction.member instanceof GuildMember ? interaction.member.voice.channel : null;
     if (!voiceChannel) {
         return []; // ユーザーがボイスチャンネルに接続していない場合は空の配列を返す
-    };
+    }
 
     const channelName = voiceChannel.name;
     const channelBitrate = Number(voiceChannel.bitrate) / 1000;
@@ -246,7 +246,7 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
         };
         //公開してなかったらブロックしているユーザーの情報も追加する
         buttonComponentName === "publicButton" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
-    };
+    }
     return embedFielsArray;
 };
 export async function blockSettingUpdate(interaction: UserSelectMenuInteraction | ButtonInteraction) {
@@ -254,7 +254,7 @@ export async function blockSettingUpdate(interaction: UserSelectMenuInteraction 
     const blockUserListObject = {
         name: "ブロックしているユーザー",
         value: blockUserListValue
-    }
+    };
     return blockUserListObject;
 }
 /**
@@ -268,7 +268,7 @@ export async function editChannelPermission(channel: VoiceBasedChannel,  ownerUs
         const allUsers = await prisma.blockLists.findMany({
             where: {
                 user_id: String(ownerUser.id),
-            },
+            }
         });
         // チャンネル権限オーバーライド
         const overwrites: OverwriteResolvable[] = [
@@ -297,8 +297,8 @@ export async function editChannelPermission(channel: VoiceBasedChannel,  ownerUs
                     id: blockUser,
                     deny: [denyUserPermisson]
                 });
-            };
-        };
+            }
+        }
         // -----------------------------------------------------------------------------------------------------------
         // チャンネルの権限をセットする
         // -----------------------------------------------------------------------------------------------------------
@@ -312,9 +312,9 @@ export async function editChannelPermission(channel: VoiceBasedChannel,  ownerUs
         );
         for (const [_, member] of blockedConnectedMembers) {
             await member.voice.disconnect();
-        };
-    };
-};
+        }
+    }
+}
 /**
  * ブロックしているユーザーを確認
  * @param interaction インタラクション
@@ -325,11 +325,11 @@ export async function showBlockList(interaction: MenuInteraction, user: string) 
     const allUsers = await prisma.blockLists.findMany({
         where: {
             user_id: String(interaction.user.id),
-        },
+        }
     });
     // ブロックしているユーザーリストの文字列を作成
     const blockUserList: string = allUsers.length > 0
         ? allUsers.map((user: { block_user_id: any; }) => `<@${user.block_user_id}>`).join("\n")
         : "なし";
     return blockUserList;
-};
+}

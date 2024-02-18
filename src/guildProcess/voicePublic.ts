@@ -51,7 +51,7 @@ module.exports = {
                         components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, confirmationButton]
                     });
                     break
-                };
+                }
                 case "startButton": {
                     const voiceChannel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
                     if (!voiceChannel) return;
@@ -63,7 +63,7 @@ module.exports = {
                         components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, confirmationButton]
                     });
                     break;
-                };
+                }
                 case "confirmationButton": {
                     await interaction.reply({
                         embeds: [
@@ -75,6 +75,6 @@ module.exports = {
             }
         } catch(error) {
             console.log(error);
-        };
+        }
     }
 };

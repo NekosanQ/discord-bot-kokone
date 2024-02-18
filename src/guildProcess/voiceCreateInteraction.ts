@@ -100,7 +100,7 @@ module.exports = {
                     ephemeral: true
                 });
                 return;
-            };
+            }
             switch (interaction.customId) {
                 // -----------------------------------------------------------------------------------------------------------
                 // チャンネルの公開/設定の開始
@@ -110,7 +110,7 @@ module.exports = {
                 case "confirmationButton": {
                     await require("../guildProcess/voicePublic").execute(interaction);
                     break;
-                };
+                }
                 // -----------------------------------------------------------------------------------------------------------
                 // チャンネルの設定
                 // -----------------------------------------------------------------------------------------------------------
@@ -121,15 +121,15 @@ module.exports = {
                         case "name": { // 名前
                             await interaction.showModal(changeNameModal);
                             break;
-                        };
+                        }
                         case "peopleLimited": { // 人数制限
                             await interaction.showModal(changePeopleLimitedModal);
                             break;
-                        };
+                        }
                         case "bitrate": { // ビットレート
                             await interaction.showModal(changeBitrateModal);
                             break;
-                        };
+                        }
                         case "owner": {
                             // VCのオーナーの変更
                             await interaction.reply({
@@ -139,7 +139,7 @@ module.exports = {
                             });
                             break;
                         }
-                    };
+                    }
                     break;
                 }
                 // -----------------------------------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ module.exports = {
                         content: `チャンネルの名前を${channelName}に変更しました`
                     });
                     break;
-                };
+                }
                 
                 // -----------------------------------------------------------------------------------------------------------
                 // 人数制限の変更
@@ -189,9 +189,9 @@ module.exports = {
                         await interaction.editReply({
                             content: `チャンネルの人数制限を${channelUserLimit}に変更しました`
                         });
-                    };
+                    }
                     break;
-                };
+                }
                 // -----------------------------------------------------------------------------------------------------------
                 // ビットレートの変更
                 // -----------------------------------------------------------------------------------------------------------
@@ -219,9 +219,9 @@ module.exports = {
                         await interaction.editReply({
                             content: `チャンネルのビットレートを${channelBitrate}kbpsに変更しました`,
                         });
-                    };
+                    }
                     break;
-                };
+                }
                 // -----------------------------------------------------------------------------------------------------------
                 // VCの譲渡
                 // -----------------------------------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ module.exports = {
                             ephemeral: true,
                         });
                         return;
-                    };
+                    }
                     // 譲渡先がBotでないか確認
                     if (newOwner.user.bot) {
                         await interaction.reply({
@@ -244,7 +244,7 @@ module.exports = {
                             ephemeral: true,
                         });
                         return;
-                    };
+                    }
                     if (!channel) return;
 
                     // 譲渡先が自分自身の場合かつ、オーナーが既に自分の場合
@@ -254,7 +254,7 @@ module.exports = {
                             ephemeral: true,
                         });
                         return;
-                    };
+                    }
 
                     // 譲渡先のユーザーがVCに入っているか確認
                     if (newOwner.voice.channelId !== channel.id) {
@@ -263,7 +263,7 @@ module.exports = {
                             ephemeral: true,
                         });
                         return;
-                    };
+                    }
 
                     await interaction.deferReply({ ephemeral: true });
 
@@ -276,7 +276,7 @@ module.exports = {
                     });
 
                     return;
-                };
+                }
                 // -----------------------------------------------------------------------------------------------------------
                 // ユーザーのブロック
                 // -----------------------------------------------------------------------------------------------------------
@@ -308,8 +308,8 @@ module.exports = {
                                     block_user_id: String(blockUserId)
                                 }
                             });
-                        };
-                    };
+                        }
+                    }
                     const blockedUserNum = selectedMemberNum - privilegedUsers.length - alreadyBlockedUsers.length; // ブロック出来るユーザーの数
                     let replyMessage = `選択した${selectedMemberNum}人${selectedMemberNum === blockedUserNum ? "" : `の内${blockedUserNum}人`}のユーザーのブロックが完了しました。\n`;
                     if (blockedUserNum == 0) {
@@ -330,7 +330,7 @@ module.exports = {
                         content: replyMessage
                     });
                     break;
-                };
+                }
                 case "userBlockReleaseList": {
                     if (!interaction.isUserSelectMenu()) return;
                     await interaction.deferReply({ ephemeral: true });
@@ -350,19 +350,19 @@ module.exports = {
                                     where: {
                                         user_id: String(userId),
                                         block_user_id: String(blockUserId),
-                                    },
+                                    }
                                 });
-                            };
-                        };
-                    };
+                            }
+                        }
+                    }
                     await editChannelPermission(channel, interaction.user);
                     // リプライを送信
                     await interaction.editReply({
                         content: "選択したユーザーのブロック解除が完了しました",
                     });
                     break;
-                };
-            };
+                }
+            }
             // -----------------------------------------------------------------------------------------------------------
             // チャンネルの設定を更新するための処理
             // -----------------------------------------------------------------------------------------------------------
@@ -377,10 +377,7 @@ module.exports = {
              * @param blockUserId ブロックするユーザーのID
              * @returns 特権があればtrue、なければfalse
              */
-            async function validatePrivilegedUser(
-                interaction: MenuInteraction,
-                blockUserId: string,
-            ): Promise<boolean> {
+            async function validatePrivilegedUser(interaction: MenuInteraction, blockUserId: string): Promise<boolean> {
                 // 自身のIDを取得
                 const userId: string = String(interaction.user.id);
                 // メンバーを取得
@@ -390,9 +387,9 @@ module.exports = {
                     blockUserId === userId ||
                     member?.permissions.has(PermissionsBitField.Flags.MoveMembers) === true
                 );
-            };
+            }
         } catch(error) {
             console.log(error);
-        };
+        }
     }
 };

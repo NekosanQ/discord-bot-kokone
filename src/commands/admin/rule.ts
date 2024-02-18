@@ -17,7 +17,7 @@ module.exports = {
                 components: [languageMenu, agreeButton]
             });
             return;
-        };
+        }
         // -----------------------------------------------------------------------------------------------------------
         // 利用規約に同意/言語を選択した時の処理
         // -----------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ module.exports = {
                 embeds: [embeds.rule[page + 1]],
                 ephemeral: true,
             });
-        };
+        }
         if (interaction.customId === "agreebutton") {  // 利用規約に同意した時の処理
             try {
                 const role: boolean = interaction.member.roles.cache.has(config.uncertifiedRoleId);
@@ -52,7 +52,7 @@ module.exports = {
                 };
             } catch (error) {
                 appendFile("logs/error.log", `[${date}] ${error}`);
-            };
-        };
+            }
+        }
     }
 };

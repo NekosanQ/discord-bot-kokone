@@ -24,7 +24,7 @@ export const client: Client = new Client({
         Partials.Message, 
         Partials.Channel
     ]
-})
+});
 
 client.commands = new Collection();
 
@@ -44,9 +44,9 @@ for (const folder of commandFolders) {
 			client.commands.set(command.data.name, command);
 		} else {
 			console.log(`[WARNING] ${filePath}のコマンドには、必須の "data "または "execute "プロパティがありません。`);
-		};
-	};
-};
+		}
+	}
+}
 // -----------------------------------------------------------------------------------------------------------
 // イベントハンドラー
 // -----------------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ for (const file of eventFiles) {
 		client.once(event.name, (...args) => event.execute(...args));
 	} else {
 		client.on(event.name, (...args) => event.execute(...args));
-	};
-};
+	}
+}
 
 client.login(process.env.KokoneToken);

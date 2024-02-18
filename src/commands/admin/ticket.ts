@@ -48,7 +48,7 @@ module.exports = {
                 components: [ticketButton]
             });
             return;
-        };
+        }
         // -----------------------------------------------------------------------------------------------------------
         // お問い合わせを作成した時の処理
         // -----------------------------------------------------------------------------------------------------------
@@ -114,8 +114,8 @@ module.exports = {
                         console.log("作成したお問い合わせチャンネルにメッセージを送信できませんでした")
                     };
                 }
-            };
-        };
+            }
+        }
         if (interaction.customId === "deletebutton_ticket") {
             const channelId: string | undefined = interaction.channel?.id;
             if(channelId) {
@@ -128,6 +128,6 @@ module.exports = {
             } else {
                 console.log("チャンネルを削除しようとしましたが、見つかりませんでした")
             }
-        };
+        }
     }
 };

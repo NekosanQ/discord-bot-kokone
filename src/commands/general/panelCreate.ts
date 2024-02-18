@@ -39,18 +39,18 @@ module.exports = {
                                 ephemeral: true
                             });
                             return;
-                        };
+                        }
                     };
                     await interaction.reply({
                         embeds: [mmobileChannelEmbed],
                         components: [startButton]
-                    })
-                };
+                    });
+                }
             } catch(error) {
                 console.log(error);
-            };
+            }
         } else {
             await require("../../guildProcess/voiceCreateInteraction").execute(interaction);
-        };
+        }
 	} 
 };

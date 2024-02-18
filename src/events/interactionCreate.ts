@@ -26,7 +26,7 @@ module.exports = {
 			} catch (error) {
 				console.error(`[ERROR] 実行エラー: ${commandName}`);
 				console.error(error);
-			};
+			}
 		} else if (!command) {
 			try {
 				await require("../guildProcess/voiceCreateInteraction").execute(interaction);

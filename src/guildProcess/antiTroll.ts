@@ -37,11 +37,14 @@ module.exports = {
                 let inviteMentionCount: number = 0; // 募集通知カウント
                 for (let key of messageRole.keys()) { // メンションの数だけ繰り返す
                     for (let n = 0; n < config.inviteRoleId.length; n++) { // 募集通知のロールがあるか確認
+                        console.log("key:" + key)
                         if (key == config.inviteRoleId[n]) { // 募集通知のロールがあった場合の処理
                             inviteMentionCount++; // 募集通知カウントを増やす
                         };
+                        console.log(inviteMentionCount);
                     };
                 };
+                console.log("a" + messageRole.size)
                 if (inviteMentionCount == messageRole.size) { // 募集通知のロールのみメンションされていた場合の処理
                     await message.react(message.guild?.emojis.cache.get(config.checkMarkId) ?? "");
                 } else { // 募集通知以外のメンションがあった場合の処理
@@ -59,7 +62,7 @@ module.exports = {
                     await setTimeout(10000);
                     await errorMessageSend.delete();
                     return;
-                };  
+                }
                 if (!voiceChannel) {
                     const errorMessage: string = "ボイスチャンネルにいないユーザーのメンションを検出しました";
                     appendFile("logs/violation.log", `[${date}] ${errorMessage} <違反ユーザー/ID>: <違反ユーザー表示名/名前/ID>: ${message.author.displayName}/${message.author.username}/${message.author.id}\n`);
@@ -71,7 +74,7 @@ module.exports = {
                 }
             } catch (error) {
                 appendFile("logs/error.log", `[${date}] ${error}`);
-            };
+            }
         };
         // ------------------------------------------------------------------------------------------------------------
         // 全体メンションをした場合の処理

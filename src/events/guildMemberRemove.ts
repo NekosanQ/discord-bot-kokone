@@ -25,6 +25,6 @@ module.exports = {
             await (getEntranceChannelId as TextChannel).send({
                 embeds: [removeMessageEmbed]
             });
-        };
+        }
     }
 }

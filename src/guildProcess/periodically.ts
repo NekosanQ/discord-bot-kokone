@@ -27,9 +27,9 @@ module.exports = {
                         }, 1000);
                     };
                 });
-            };
+            }
         } catch (error) {
             appendFile("logs/error.log", `[${date}] ${error}`);
-        };
+        }
     }
 };

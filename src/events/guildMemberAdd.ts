@@ -40,12 +40,12 @@ module.exports = {
             await (getEntranceChannelId as TextChannel).send({
                 embeds: [welcomeMessageEmbed.entrance]
             });
-        };
+        }
         if (getChatChannelId) { // 雑談チャンネルに送信
             await (getChatChannelId as TextChannel).send({
                 content: `<@&${config.newMemberNoticeRoleId}>新規さん来たよ！`,
                 embeds: [welcomeMessageEmbed.chat]
             });
-        };
+        }
     }
 };

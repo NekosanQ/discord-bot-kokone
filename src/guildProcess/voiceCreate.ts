@@ -93,12 +93,12 @@ module.exports = {
                 .catch((error: Error) => {
                     console.error(error);
                     newVoiceChannel.send("移動に失敗しました");
-                });
+                })
             })
             .catch((error: Error) => {
                 console.error(error);
-            });
-        };
+            })
+        }
         // -----------------------------------------------------------------------------------------------------------
         // VCに誰もいない場合、チャンネルを削除する処理
         // -----------------------------------------------------------------------------------------------------------
@@ -106,18 +106,18 @@ module.exports = {
             try {
                 for (let i = 0; i < config.defaultVoiceChannelList.length; i++) { // デフォルトで存在しているボイスチャンネルを除外する
                     if (config.defaultVoiceChannelList[i] === oldState.channelId) return;
-                };
+                }
                 if (oldState.channel?.members.size === 0) { // チャンネルに誰もいない場合
                     const timeout = setTimeout(() => { // 30秒後に削除する予約を作成
                         oldState.channel?.delete();
                         deleteMap.delete(oldState.channel?.id!);
                     }, 30 * 1000);
                     deleteMap.set(oldState.channel.id, timeout); // マップに予約を保存
-                };
+                }
             } catch (error) {
                 console.log(error);
-            };
-        };
+            }
+        }
         // -----------------------------------------------------------------------------------------------------------
         // VCに入り直した場合、チャンネルを削除する予約をキャンセルする処理
         // -----------------------------------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ module.exports = {
                 };
             } catch (error) {
                 console.log(error);
-            };
-        };
+            }
+        }
     },
 };

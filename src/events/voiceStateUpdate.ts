@@ -42,7 +42,7 @@ module.exports = {
             } else {
                 // 新しいチャンネルがないなら退出したと判定
                 logMessage += "退出しました";
-            };
+            }
             logMessage += ` <ユーザー表示名/ID> ${userName} <チャンネル名/ID> ${voiceChannelName}\n`;
             appendFile("logs/voice.log", logMessage);
         } catch (error) {

@@ -41,9 +41,9 @@ module.exports = {
                             content: message?.url
                         })
                     )
-            };
+            }
         } catch(error) {
             console.log(error);
-        };
+        }
 	}
 };
