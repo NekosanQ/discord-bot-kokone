@@ -5,4 +5,4 @@ export function writeFile(path: string, data: string) {
     fs.writeFile(path, data, (err) => {
         if (err) throw err;
     });
-};
+}

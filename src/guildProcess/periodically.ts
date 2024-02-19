@@ -25,7 +25,7 @@ module.exports = {
                         setTimeout(() => { // ファイルを送信した1秒後に上書きする
                             writeFile(filePath, "");
                         }, 1000);
-                    };
+                    }
                 });
             }
         } catch (error) {

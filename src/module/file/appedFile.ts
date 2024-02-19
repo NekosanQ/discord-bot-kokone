@@ -5,4 +5,4 @@ export function appendFile(path: string, data: string) {
     fs.appendFile(path, data, (err) => {
         if (err) throw err;
     });
-};
+}

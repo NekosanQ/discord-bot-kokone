@@ -38,5 +38,5 @@ export const config: Config = ((): Config => {
     } catch (error) {
         logger.error("コンフィグの読み込みに失敗しました", error);
         exit(1);
-    };
+    }
 })();

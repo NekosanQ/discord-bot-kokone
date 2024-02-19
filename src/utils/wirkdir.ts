@@ -10,4 +10,4 @@ export const workdir = process.env.APP_BASEDIR ?? "run";
  */
 export function getWorkdirPath(path: string): string {
     return join(workdir, path);
-};
+}

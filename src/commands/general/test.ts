@@ -11,5 +11,5 @@ module.exports = {
             content: "成功: Discord.js in TypeScript",
             allowedMentions: { repliedUser: false }
         });
-	},
+	}
 };

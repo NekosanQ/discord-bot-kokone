@@ -248,7 +248,7 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
         buttonComponentName === "publicButton" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
     }
     return embedFielsArray;
-};
+}
 export async function blockSettingUpdate(interaction: UserSelectMenuInteraction | ButtonInteraction) {
     const blockUserListValue = await showBlockList(interaction, interaction.user.id);
     const blockUserListObject = {

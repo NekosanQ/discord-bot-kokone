@@ -9,7 +9,7 @@ import {
     userBlockListMenu, 
     userBlockReleaseListMenu, 
 } from "../module/voiceController";
-import { channelSettingUpdate, editChannelPermission, getChannelOwner } from "../module/voiceController";
+import { channelSettingUpdate, editChannelPermission } from "../module/voiceController";
 
 const commandChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
