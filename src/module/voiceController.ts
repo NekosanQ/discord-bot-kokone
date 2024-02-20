@@ -258,7 +258,6 @@ export function channelStatusCheckUpdate(interaction: MenuInteraction): string {
     const authenticatedRoleBitfield = voiceChannel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
     const voiceNotConnectBitfield = "39722041069120"; // VC接続の権限がない場合のビットフィールド(文字列に変換後の値)
     const voicePublicBitfield = "39722042117696"; // VCを公開している場合のビットフィールド(文字列に変換後の値)
-
     if (authenticatedRoleBitfield == voiceNotConnectBitfield) {
         channelStatus = "🔒ロック中";
     } else if (authenticatedRoleBitfield == voicePublicBitfield) {
@@ -297,11 +296,11 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
             name: "ブロックしているユーザー",
             value: blockUserListValue
         };
-        if (interaction.channel as TextChannel) { // テキストチャンネルで操作している場合の処理
+        if (interaction.channel instanceof TextChannel) { // テキストチャンネルで操作している場合の処理
             embedFielsArray.push(settingChannelObject);
         } else { // ボイスチャンネルで操作している場合の処理
             // 公開してなかったらブロックしているユーザーの情報も追加する
-            authenticatedRoleBitfield === voicePublicBitfield ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
+            authenticatedRoleBitfield === "0" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
         }
     }
     return embedFielsArray;
@@ -360,7 +359,7 @@ export async function editChannelPermission(channel: VoiceBasedChannel,  ownerUs
             }
         });
         // チャンネル権限オーバーライド
-        const overwrites: OverwriteResolvable[] = [
+        let overwrites: OverwriteResolvable[] = [
             ...inherit,
             {
                 id: ownerUser,
@@ -392,16 +391,6 @@ export async function editChannelPermission(channel: VoiceBasedChannel,  ownerUs
         // チャンネルの権限をセットする
         // -----------------------------------------------------------------------------------------------------------
         await channel.permissionOverwrites.set(overwrites);
-
-        // -----------------------------------------------------------------------------------------------------------
-        // ブロックされたユーザーが既にVCにいる場合、VCから退出させる
-        // -----------------------------------------------------------------------------------------------------------
-        const blockedConnectedMembers = channel.members.filter((member) =>
-            allUsers.find((user: { block_user_id: string; }) => member.id === user.block_user_id),
-        );
-        for (const [_, member] of blockedConnectedMembers) {
-            await member.voice.disconnect();
-        }
     }
 }
 /**

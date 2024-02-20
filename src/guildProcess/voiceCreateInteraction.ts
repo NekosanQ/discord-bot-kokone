@@ -313,7 +313,7 @@ module.exports = {
                         content: `<@${newOwner.id}> にVCのオーナーを譲渡しました`,
                     });
 
-                    return;
+                    break;
                 }
                 // -----------------------------------------------------------------------------------------------------------
                 // ユーザーのブロック
@@ -363,7 +363,10 @@ module.exports = {
                             .join(", ");
                         replyMessage += `${errorUsersString} は既にブロックされているためブロックできませんでした。\n`;
                     };
-                    await editChannelPermission(channel, interaction.user);
+                    const authenticatedRoleBitfield = channel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
+                    if (!(authenticatedRoleBitfield === "0")) {
+                        await editChannelPermission(channel, interaction.user);
+                    }
                     await interaction.editReply({
                         content: replyMessage
                     });
@@ -393,7 +396,10 @@ module.exports = {
                             }
                         }
                     }
-                    await editChannelPermission(channel, interaction.user);
+                    const authenticatedRoleBitfield = channel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
+                    if (!(authenticatedRoleBitfield === "0")) {
+                        await editChannelPermission(channel, interaction.user);
+                    }
                     // リプライを送信
                     await interaction.editReply({
                         content: "選択したユーザーのブロック解除が完了しました",
