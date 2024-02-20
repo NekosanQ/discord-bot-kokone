@@ -5,10 +5,10 @@ import {
     userBlockListMenu, 
     userBlockReleaseListMenu, 
     operationMenu, 
-    publicButton, 
     allowUserPermisson, 
     denyUserPermisson,
-    allowCreateUserPermisson, 
+    allowCreateUserPermisson,
+    defaultSettingButton, 
 } from "../module/voiceController";
 import { PrismaClient } from "@prisma/client"
 import { config } from "../utils/config";
@@ -83,11 +83,11 @@ module.exports = {
                     newVoiceChannel.send({ // 移動が成功したらメッセージを送信
                         content: `<@${userId}>`,
                         embeds: [createChannelEmbed.setFields(
-                                { name: "現在の設定", value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitrate}kbps`},
+                                { name: "現在の設定", value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitrate}kbps\nVCの状態: 🔴非公開`},
                                 { name: "ブロックしているユーザー", value: blockUserList}
                             )
                         ],
-                        components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, publicButton]
+                        components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, defaultSettingButton]
                     });
                 })
                 .catch((error: Error) => {

@@ -17,7 +17,8 @@ import {
     OverwriteType,
     GuildMember,
     ModalBuilder,
-    VoiceChannel
+    VoiceChannel,
+    TextChannel
 } from "discord.js";
 
 import { config } from "../utils/config.js";
@@ -49,6 +50,13 @@ export const settingChannelEmbed: EmbedBuilder = new EmbedBuilder()
 export const settingBlockEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
     .setTitle("ブロックユーザー一覧")
+    .setDescription("設定を行いたい場合、設定画面のメニューから設定を行ってください。")
+/**
+ * VCのロック設定時に送る埋め込みメッセージ
+ */
+export const settingLockEmbed: EmbedBuilder = new EmbedBuilder()
+    .setColor(Number(config.botColor))
+    .setTitle("VCのロックの設定")
     .setDescription("設定を行いたい場合、設定画面のメニューから設定を行ってください。")
 /**
  * ブロックするユーザーを選択するためのセレクトメニュー
@@ -83,45 +91,71 @@ export const operationMenu: ActionRowBuilder<StringSelectMenuBuilder> = new Acti
             {
                 label: "名前",
                 description: "チャンネルの名前を変更できます",
+                emoji: "<:bot_2:1033758462590599188>",
                 value: "name_change"
             },
             {
                 label: "人数制限",
                 description: "人数制限の人数を変更できます(0~99)",
+                emoji: "<:bot_2:1033758462590599188>",
                 value: "peopleLimited_change"
             },
             {
                 label: "ビットレート",
                 description: "ビットレート(音質)を変更できます(8~384)",
+                emoji: "<:bot_2:1033758462590599188>",
                 value: "bitrate_change"
             },
             {
-                label: "VCのオーナーの変更",
+                label: "オーナーの変更",
                 description: "VCの管理権限を他の人に渡します",
+                emoji: "<:bot_14:1050454131573276712>",
                 value: "owner_change"
             },
         )
 );
 /**
+ * VCをロックするためのボタン
+ */
+let lockSettingButton: ButtonBuilder = new ButtonBuilder()
+    .setCustomId("lockButton")
+    .setLabel("🔒")
+    .setStyle(ButtonStyle.Primary)
+/**
+ * VCのロックを解除するためのボタン
+ */
+const unLockSettingButton: ButtonBuilder = new ButtonBuilder()
+    .setCustomId("unLockButton")
+    .setLabel("🔓")
+    .setStyle(ButtonStyle.Primary)
+/**
  * チャンネルを公開するためのボタン
  */
-export const publicButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
-    .addComponents(
-        new ButtonBuilder()
-            .setCustomId("publicButton")
-            .setLabel("ボイスチャンネルを公開する")
-            .setStyle(ButtonStyle.Success)
-    )
+const publicButton: ButtonBuilder = new ButtonBuilder()
+    .setCustomId("publicButton")
+    .setLabel("ボイスチャンネルを公開する")
+    .setStyle(ButtonStyle.Success)
 /**
  * ブロックしているユーザーを確認するためのボタン
  */
-export const confirmationButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
-    .addComponents(
-        new ButtonBuilder()
-            .setCustomId("confirmationButton")
-            .setLabel("ブロックユーザーを確認する")
-            .setStyle(ButtonStyle.Success)
-    )
+const confirmationButton: ButtonBuilder = new ButtonBuilder()
+    .setCustomId("confirmationButton")
+    .setLabel("ブロックユーザーを確認する")
+    .setStyle(ButtonStyle.Success)
+/**
+ * 更新ボタン
+ */
+const reloadButton: ButtonBuilder = new ButtonBuilder()
+    .setCustomId("reloadButton")
+    .setLabel("🔄️")
+    .setStyle(ButtonStyle.Primary)
+/**
+ * セレクトメニューの下にある操作ボタン
+ */
+export let settingButton: ActionRowBuilder<ButtonBuilder>;
+
+export const defaultSettingButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
+    .addComponents(publicButton, reloadButton)
 /**
  * VCのオーナーの変更を行う際のモーダル
  */
@@ -180,7 +214,6 @@ export const allowCreateUserPermisson: bigint[] = [
 export const denyUserPermisson: bigint[] = [
     PermissionsBitField.Flags.ViewChannel,            // チャンネルを見る
 ];
-
 /**
  * VCコントローラーで用いるインタラクションの型
  */
@@ -198,7 +231,7 @@ export type MenuInteraction =
 export function getChannelOwner(channel: VoiceBasedChannel): GuildMember | undefined {
     const ownerUser = channel.permissionOverwrites.cache.find( // チャンネルのオーナーを取得
         (permission) =>  {
-            permission.type === OverwriteType.Member && permission.allow.has(PermissionsBitField.Flags.ManageChannels); // 優先スピーカー権限を持っているユーザーを取得
+            permission.type === OverwriteType.Member && permission.allow.has(PermissionsBitField.Flags.ManageChannels); // チャンネルの管理権限を持っているユーザーを取得
         }
     );
     if (!ownerUser) return undefined;
@@ -209,14 +242,35 @@ export function getChannelOwner(channel: VoiceBasedChannel): GuildMember | undef
  * @param channelUserLimit ユーザー人数制限
  * @returns 
  */
-export function channelUserLimitMessage(channelUserLimit: number | string) {
+export function channelUserLimitMessage(channelUserLimit: number | string): string {
     channelUserLimit = channelUserLimit === 0 ? "無制限" : `${channelUserLimit}人`;
     return channelUserLimit;
 }
 /**
- * 埋め込みメッセージの設定フィールドを作成する
-* @returns 埋め込みメッセージの設定フィールドを返す
-*/
+ * チャンネルのステータスを更新する
+ * @param interaction セレクトメニュー
+ * @returns チャンネルステータス
+ */
+export function channelStatusCheckUpdate(interaction: MenuInteraction): string {
+    let channelStatus = "🔴非公開";
+    if (!interaction.message) return "🔴情報が取得できませんでした"
+    const voiceChannel = interaction.member instanceof GuildMember ? interaction.member.voice.channel : null; // ユーザーが接続しているボイスチャンネルを取得
+    const authenticatedRoleBitfield = voiceChannel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
+    const voiceNotConnectBitfield = "39722041069120"; // VC接続の権限がない場合のビットフィールド(文字列に変換後の値)
+    const voicePublicBitfield = "39722042117696"; // VCを公開している場合のビットフィールド(文字列に変換後の値)
+
+    if (authenticatedRoleBitfield == voiceNotConnectBitfield) {
+        channelStatus = "🔒ロック中";
+    } else if (authenticatedRoleBitfield == voicePublicBitfield) {
+        channelStatus = "🟢公開中";
+    }
+    return channelStatus;
+}
+/**
+ * チャンネルの設定の表示を更新する
+ * @param interaction メニュー
+ * @returns 埋め込みメッセージの設定フィールド
+ */
 export async function channelSettingUpdate(interaction: MenuInteraction): Promise<{ name: string; value: string; }[]> {
     // ユーザーが接続しているボイスチャンネルを取得
     const voiceChannel = interaction.member instanceof GuildMember ? interaction.member.voice.channel : null;
@@ -231,25 +285,60 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
 
     const embedFielsArray = [];
     if (interaction.message) {
-        const buttonComponentName = interaction.message?.components.length > 2 
-        ? interaction.message?.components[3].components[0].customId // ボタンのcustomIdを取得
-        : interaction.message?.components[0].components[0].customId; // ボタンのcustomIdを取得
+        const authenticatedRoleBitfield = voiceChannel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
+        const voicePublicBitfield = "39722042117696"; // VCを公開している場合のビットフィールド(文字列に変換後の値)
 
         const settingChannelObject = {
             name: "現在の設定", 
-            value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitrate}kbps` 
+            value: `チャンネル名: ${channelName}\nユーザー人数制限: ${channelUserLimit}\nビットレート: ${channelBitrate}kbps\nVCの状態: ${channelStatusCheckUpdate(interaction)}` 
         };
         const blockUserListValue = await showBlockList(interaction, interaction.user.id);
         const blockUserListObject = {
             name: "ブロックしているユーザー",
             value: blockUserListValue
         };
-        //公開してなかったらブロックしているユーザーの情報も追加する
-        buttonComponentName === "publicButton" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
+        if (interaction.channel as TextChannel) { // テキストチャンネルで操作している場合の処理
+            embedFielsArray.push(settingChannelObject);
+        } else { // ボイスチャンネルで操作している場合の処理
+            // 公開してなかったらブロックしているユーザーの情報も追加する
+            authenticatedRoleBitfield === voicePublicBitfield ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
+        }
     }
     return embedFielsArray;
 }
-export async function blockSettingUpdate(interaction: UserSelectMenuInteraction | ButtonInteraction) {
+/**
+ * コンポーネントを更新する
+ * @param interaction メニュー
+ * @returns 設定のコンポーネント
+ */
+export function settingComponentUpdate(interaction: MenuInteraction) {
+    if (!interaction.message) return
+    const voiceChannel = interaction.member instanceof GuildMember ? interaction.member.voice.channel : null; // ユーザーが接続しているボイスチャンネルを取得
+    const authenticatedRoleBitfield = voiceChannel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
+    const voiceNotConnectBitfield = "39722041069120"; // VC接続の権限がない場合のビットフィールド(文字列に変換後の値)
+    const voicePublicBitfield = "39722042117696"; // VCを公開している場合のビットフィールド(文字列に変換後の値)
+
+    let settingComponent: ActionRowBuilder<StringSelectMenuBuilder | ButtonBuilder | UserSelectMenuBuilder>[] = [operationMenu, userBlockListMenu, userBlockReleaseListMenu]; // 初期コンポーネント
+
+    if (authenticatedRoleBitfield == voiceNotConnectBitfield) { // VCに接続できる権限がない場合の処理
+        settingButton = new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(confirmationButton, unLockSettingButton, reloadButton);
+    } else if (authenticatedRoleBitfield == voicePublicBitfield) { // VCに接続できる権限がある場合の処理
+        settingButton = new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(confirmationButton, lockSettingButton, reloadButton);
+    } else { // VCを公開してない場合の処理
+        settingButton = new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(publicButton, reloadButton);
+    }
+    settingComponent.push(settingButton)
+    return settingComponent;
+}
+/**
+ * ブロックしているユーザーの一覧を更新する
+ * @param interaction ユーザーセレクトメニュー/ボタン
+ * @returns ブロックしているユーザーオブジェクト
+ */
+export async function blockSettingUpdate(interaction: UserSelectMenuInteraction | ButtonInteraction): Promise<{ name: string; value: string; }> {
     const blockUserListValue = await showBlockList(interaction, interaction.user.id);
     const blockUserListObject = {
         name: "ブロックしているユーザー",

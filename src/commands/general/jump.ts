@@ -40,7 +40,7 @@ module.exports = {
                         interaction.editReply({
                             content: message?.url
                         })
-                    )
+                    );
             }
         } catch(error) {
             console.log(error);

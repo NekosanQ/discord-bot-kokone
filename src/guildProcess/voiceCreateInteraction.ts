@@ -10,9 +10,8 @@ import {
     VoiceChannel, 
     PermissionsBitField,
     CacheType,
-    UserSelectMenuInteraction,
     User,
-    GuildMember, 
+    GuildMember
 } from "discord.js";
 import { MenuInteraction, 
     channelSettingUpdate, 
@@ -20,7 +19,8 @@ import { MenuInteraction,
     editChannelPermission, 
     getChannelOwner, 
     transferOwnershipMenu,
-    transferOwnershipEmbed
+    transferOwnershipEmbed,
+    settingComponentUpdate
 } from "../module/voiceController";
 import { config } from "../utils/config";
 import { PrismaClient } from "@prisma/client";
@@ -30,10 +30,6 @@ const prisma = new PrismaClient();
 const editChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
     .setTitle("ボイスチャンネルの設定を変更しました")
-    .setDescription("設定を行いたい場合、下のメニューから設定を行ってください。")
-const editBlockEmbed: EmbedBuilder = new EmbedBuilder()
-    .setColor(Number(config.botColor))
-    .setTitle("ブロックするユーザーの設定を変更しました")
     .setDescription("設定を行いたい場合、下のメニューから設定を行ってください。")
 
 const changeNameModal: ModalBuilder = new ModalBuilder()
@@ -78,6 +74,7 @@ changePeopleLimitedModal.addComponents(changePeopleLimitedRow);
 
 const changeBitrateRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(changeBitrateInput);
 changeBitrateModal.addComponents(changeBitrateRow);
+
 // -----------------------------------------------------------------------------------------------------------
 // ボイスチャンネル作成のインタラクション処理
 // -----------------------------------------------------------------------------------------------------------
@@ -92,7 +89,7 @@ module.exports = {
         try {
             if (!interaction.isButton() && !interaction.isStringSelectMenu() && !interaction.isModalSubmit() && !interaction.isUserSelectMenu()) return;
             const channel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
-            if(!channel) return;
+            if (!channel) return;
             const permissionOverwrites = channel.permissionOverwrites.cache.get(interaction.user.id);
             if (permissionOverwrites && !permissionOverwrites.allow.has(PermissionsBitField.Flags.ManageChannels)) {
                 await interaction.reply({
@@ -101,6 +98,7 @@ module.exports = {
                 });
                 return;
             }
+            
             switch (interaction.customId) {
                 // -----------------------------------------------------------------------------------------------------------
                 // チャンネルの公開/設定の開始
@@ -112,26 +110,66 @@ module.exports = {
                     break;
                 }
                 // -----------------------------------------------------------------------------------------------------------
+                // チャンネルのロック
+                // -----------------------------------------------------------------------------------------------------------
+                case "lockButton": {
+                    await interaction.deferReply({ 
+                        ephemeral: true 
+                    });
+                    await channel.permissionOverwrites.edit(config.authenticatedRoleId, {
+                        Connect: false
+                    })
+                    await interaction.editReply({
+                        content: `チャンネルをロックしました`
+                    });
+                    break;
+
+                }
+                // -----------------------------------------------------------------------------------------------------------
+                // チャンネルのロック解除
+                // -----------------------------------------------------------------------------------------------------------
+                case "unLockButton": {
+                    await interaction.deferReply({ 
+                        ephemeral: true 
+                    });
+                    await channel.permissionOverwrites.edit(config.authenticatedRoleId, {
+                        Connect: true
+                    })
+                    await interaction.editReply({
+                        content: `チャンネルのロックを解除しました`
+                    });
+                    break;
+                }
+                // -----------------------------------------------------------------------------------------------------------
+                // 更新ボタン
+                // -----------------------------------------------------------------------------------------------------------
+                case "reloadButton": {
+                    await interaction.reply({ 
+                        content: "設定画面を更新しました",
+                        ephemeral: true 
+                    });
+                    break;
+                }
+                // -----------------------------------------------------------------------------------------------------------
                 // チャンネルの設定
                 // -----------------------------------------------------------------------------------------------------------
                 case "operationMenu": {
                     if (!interaction.isStringSelectMenu()) return;
                     const operationPage = interaction.values[0].split("_")[0];
                     switch (operationPage) {
-                        case "name": { // 名前
+                        case "name": { // 名前の変更
                             await interaction.showModal(changeNameModal);
                             break;
                         }
-                        case "peopleLimited": { // 人数制限
+                        case "peopleLimited": { // 人数制限の変更
                             await interaction.showModal(changePeopleLimitedModal);
                             break;
                         }
-                        case "bitrate": { // ビットレート
+                        case "bitrate": { // ビットレートの変更
                             await interaction.showModal(changeBitrateModal);
                             break;
                         }
-                        case "owner": {
-                            // VCのオーナーの変更
+                        case "owner": { // VCのオーナーの変更
                             await interaction.reply({
                                 embeds: [transferOwnershipEmbed],
                                 components: [transferOwnershipMenu],
@@ -369,7 +407,8 @@ module.exports = {
             await interaction.message?.edit({
                 embeds: [
                     editChannelEmbed.setFields(await channelSettingUpdate(interaction))
-                ]
+                ],
+                components: settingComponentUpdate(interaction)
             });
             /**
              * ブロックするユーザーの特権チェックを行う。

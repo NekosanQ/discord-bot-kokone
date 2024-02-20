@@ -3,9 +3,9 @@ import { config } from "../utils/config";
 import { appendFile } from "../module/file/appedFile";
 import { 
     blockSettingUpdate,
-    confirmationButton,
     operationMenu, 
     settingBlockEmbed, 
+    settingComponentUpdate, 
     userBlockListMenu, 
     userBlockReleaseListMenu, 
 } from "../module/voiceController";
@@ -34,7 +34,7 @@ module.exports = {
                     const channel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
                     if(!channel) return;
                     await interaction.deferReply({ 
-                        ephemeral: true 
+                        ephemeral: true
                     });
                     // -----------------------------------------------------------------------------------------------------------
                     // チャンネルの権限をセットする
@@ -48,7 +48,7 @@ module.exports = {
                         embeds: [
                             publicChannelEmbed.setFields(await channelSettingUpdate(interaction))
                         ],
-                        components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, confirmationButton]
+                        components: settingComponentUpdate(interaction)
                     });
                     break
                 }
@@ -60,7 +60,7 @@ module.exports = {
                         embeds: [
                             commandChannelEmbed.setFields(await channelSettingUpdate(interaction))
                         ],
-                        components: [operationMenu, userBlockListMenu, userBlockReleaseListMenu, confirmationButton]
+                        components: settingComponentUpdate(interaction)
                     });
                     break;
                 }
