@@ -255,12 +255,12 @@ export function channelStatusCheckUpdate(interaction: MenuInteraction): string {
     let channelStatus = "🔴非公開";
     if (!interaction.message) return "🔴情報が取得できませんでした"
     const voiceChannel = interaction.member instanceof GuildMember ? interaction.member.voice.channel : null; // ユーザーが接続しているボイスチャンネルを取得
-    const authenticatedRoleBitfield = voiceChannel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
-    const voiceNotConnectBitfield = "39722041069120"; // VC接続の権限がない場合のビットフィールド(文字列に変換後の値)
-    const voicePublicBitfield = "39722042117696"; // VCを公開している場合のビットフィールド(文字列に変換後の値)
-    if (authenticatedRoleBitfield == voiceNotConnectBitfield) {
+
+    const permissionOverwrites = voiceChannel?.permissionOverwrites.cache.get(config.authenticatedRoleId);
+
+    if (permissionOverwrites && permissionOverwrites.deny.has(PermissionsBitField.Flags.Connect)) {
         channelStatus = "🔒ロック中";
-    } else if (authenticatedRoleBitfield == voicePublicBitfield) {
+    } else if (permissionOverwrites && permissionOverwrites.allow.has(PermissionsBitField.Flags.Connect)) {
         channelStatus = "🟢公開中";
     }
     return channelStatus;
@@ -284,8 +284,7 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
 
     const embedFielsArray = [];
     if (interaction.message) {
-        const authenticatedRoleBitfield = voiceChannel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
-        const voicePublicBitfield = "39722042117696"; // VCを公開している場合のビットフィールド(文字列に変換後の値)
+        const permissionOverwrites = voiceChannel?.permissionOverwrites.cache.get(config.authenticatedRoleId);
 
         const settingChannelObject = {
             name: "現在の設定", 
@@ -300,7 +299,11 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
             embedFielsArray.push(settingChannelObject);
         } else { // ボイスチャンネルで操作している場合の処理
             // 公開してなかったらブロックしているユーザーの情報も追加する
-            authenticatedRoleBitfield === "0" ? embedFielsArray.push(settingChannelObject, blockUserListObject) : embedFielsArray.push(settingChannelObject);
+            if (permissionOverwrites && permissionOverwrites.deny.has(PermissionsBitField.Flags.ViewChannel)) {
+                embedFielsArray.push(settingChannelObject, blockUserListObject)
+            } else {
+                embedFielsArray.push(settingChannelObject);
+            }
         }
     }
     return embedFielsArray;
@@ -313,16 +316,14 @@ export async function channelSettingUpdate(interaction: MenuInteraction): Promis
 export function settingComponentUpdate(interaction: MenuInteraction) {
     if (!interaction.message) return
     const voiceChannel = interaction.member instanceof GuildMember ? interaction.member.voice.channel : null; // ユーザーが接続しているボイスチャンネルを取得
-    const authenticatedRoleBitfield = voiceChannel?.permissionsFor(config.authenticatedRoleId)?.bitfield.toString(); // チャンネルに設定されている認証ロールの権限を取得(文字列に変換後の値)
-    const voiceNotConnectBitfield = "39722041069120"; // VC接続の権限がない場合のビットフィールド(文字列に変換後の値)
-    const voicePublicBitfield = "39722042117696"; // VCを公開している場合のビットフィールド(文字列に変換後の値)
+    const permissionOverwrites = voiceChannel?.permissionOverwrites.cache.get(config.authenticatedRoleId);
 
     let settingComponent: ActionRowBuilder<StringSelectMenuBuilder | ButtonBuilder | UserSelectMenuBuilder>[] = [operationMenu, userBlockListMenu, userBlockReleaseListMenu]; // 初期コンポーネント
 
-    if (authenticatedRoleBitfield == voiceNotConnectBitfield) { // VCに接続できる権限がない場合の処理
+    if (permissionOverwrites && permissionOverwrites.deny.has(PermissionsBitField.Flags.Connect)) { // VCに接続できる権限がない場合の処理
         settingButton = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(confirmationButton, unLockSettingButton, reloadButton);
-    } else if (authenticatedRoleBitfield == voicePublicBitfield) { // VCに接続できる権限がある場合の処理
+    } else if (permissionOverwrites && permissionOverwrites.allow.has(PermissionsBitField.Flags.Connect)) { // VCに接続できる権限がある場合の処理
         settingButton = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(confirmationButton, lockSettingButton, reloadButton);
     } else { // VCを公開してない場合の処理

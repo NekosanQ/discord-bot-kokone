@@ -91,7 +91,8 @@ module.exports = {
             const channel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
             if (!channel) return;
             const permissionOverwrites = channel.permissionOverwrites.cache.get(interaction.user.id);
-            if (permissionOverwrites && !permissionOverwrites.allow.has(PermissionsBitField.Flags.ManageChannels)) {
+
+            if (!permissionOverwrites || !permissionOverwrites.allow.has(PermissionsBitField.Flags.ManageChannels)) {
                 await interaction.reply({
                     content: "あなたにはチャンネルの設定をする権限がありません",
                     ephemeral: true
@@ -114,7 +115,7 @@ module.exports = {
                 // -----------------------------------------------------------------------------------------------------------
                 case "lockButton": {
                     await interaction.deferReply({ 
-                        ephemeral: true 
+                        ephemeral: true
                     });
                     await channel.permissionOverwrites.edit(config.authenticatedRoleId, {
                         Connect: false
