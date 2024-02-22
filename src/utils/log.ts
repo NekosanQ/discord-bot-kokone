@@ -1,5 +1,5 @@
 import log4js from 'log4js';
-import { getWorkdirPath } from './wirkdir';
+import { getWorkdirPath } from './workdir';
 
 // loggerを初期化する
 log4js.configure({

@@ -21,7 +21,7 @@ module.exports = {
                         const filePath: string = path.join(logsPath, file);
                         (getLogChannelId as TextChannel).send({
                             files: [filePath]
-                        })
+                        });
                         setTimeout(() => { // ファイルを送信した1秒後に上書きする
                             writeFile(filePath, "");
                         }, 1000);

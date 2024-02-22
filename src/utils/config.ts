@@ -1,5 +1,5 @@
 import { parse } from "toml";
-import { getWorkdirPath } from "./wirkdir";
+import { getWorkdirPath } from "./workdir";
 import { readFileSync } from "fs";
 import { logger } from "./log.js";
 import { exit } from "process";
