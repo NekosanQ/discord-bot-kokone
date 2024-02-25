@@ -9,7 +9,7 @@ log4js.configure({
             filename: getWorkdirPath('bot.log')
         },
         console: {
-        type: 'console',
+            type: 'console',
         },
     },
     categories: {
