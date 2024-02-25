@@ -7,7 +7,7 @@ logger.level = "info";
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("rule")
+        .setName("tos")
         .setDescription("利用規約を作成します"),
     async execute(interaction: Interaction<"cached">): Promise<void> {
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
@@ -29,20 +29,11 @@ module.exports = {
                 ephemeral: true,
             });
         }
-        if (interaction.customId === "agreebutton") {  // 利用規約に同意した時の処理
+        if (interaction.customId === "agreeButton") {  // 利用規約に同意した時の処理
             try {
                 const role: boolean = interaction.member.roles.cache.has(config.uncertifiedRoleId);
                 if (role) {
-                    await interaction.deferReply({ 
-                        ephemeral: true 
-                    });
-                    await interaction.member.roles.remove(config.uncertifiedRoleId);
-                    await interaction.member.roles.add(config.authenticatedRoleId);
-                    await interaction.editReply({
-                        embeds: [embeds.completed]
-                    });
-                    logger.info(`利用規約に同意しました <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}`);
-                    appendFile("logs/rule.log", `[${date}] 利用規約に同意しました <実行ユーザー/ID>: <実行ユーザー表示名/名前/ID>: ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
+                    await require("../../guildProcess/authentication").execute(interaction)
                 } else {
                     await interaction.reply({
                         embeds: [embeds.authenticated],

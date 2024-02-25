@@ -13,6 +13,7 @@ export interface Config {
     developerGuildId: string;
     generalGuildId: string;
     entranceChannelId: string;
+    tosChannelId: string;
     chatChannelId: string;
     inviteChannelId: string;
     voiceCreateChannelId: string;

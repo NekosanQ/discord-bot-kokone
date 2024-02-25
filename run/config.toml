@@ -6,6 +6,8 @@ developerGuildId = "954075863505309767"
 generalGuildId = "1189556242973196359"
 # 入退室チャンネル
 entranceChannelId = "1189556244260851852"
+# 利用規約チャンネル
+tosChannelId = "1189556244260851853"
 # 雑談チャンネル
 chatChannelId = "1189556244260851859"
 # 募集チャンネル

@@ -29,6 +29,7 @@ module.exports = {
 			}
 		} else if (!command) {
 			try {
+				await require("../guildProcess/authentication").execute(interaction);
 				await require("../guildProcess/voiceCreateInteraction").execute(interaction);
 			} catch (error) {
 				console.log(error);

@@ -1,4 +1,4 @@
-import { Events, Message } from 'discord.js';
+import { Events, Message, PermissionsBitField } from 'discord.js';
 import { appendFile } from '../module/file/appedFile';
 // -----------------------------------------------------------------------------------------------------------
 // メッセージ処理
@@ -7,6 +7,7 @@ module.exports = {
     name: Events.MessageCreate,
     async execute(message: Message): Promise<void> {
         if (message.author.bot) return;
+
         await require("../guildProcess/antiTroll").execute(message);
         await require("../guildProcess/stickyMessage").execute(message);
 

@@ -1,5 +1,5 @@
 //必要なパッケージをインポートする
-import { Client, Collection, GatewayIntentBits, Partials } from "discord.js"
+import { Client, ClientEvents, Collection, GatewayIntentBits, Partials } from "discord.js"
 import dotenv from "dotenv"
 import fs from "node:fs"
 import path from "node:path"
@@ -28,9 +28,9 @@ export const client: Client = new Client({
 
 client.commands = new Collection();
 
-// -----------------------------------------------------------------------------------------------------------
-// コマンドハンドラー
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * コマンドハンドラー
+ */
 const foldersPath: string = path.join(__dirname, 'commands');
 const commandFolders: string[] = fs.readdirSync(foldersPath);
 
@@ -47,9 +47,9 @@ for (const folder of commandFolders) {
 		}
 	}
 }
-// -----------------------------------------------------------------------------------------------------------
-// イベントハンドラー
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * イベントハンドラー
+ */
 const eventsPath: string = path.join(__dirname, 'events');
 const eventFiles: string[] = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -57,9 +57,9 @@ for (const file of eventFiles) {
 	const filePath: string = path.join(eventsPath, file);
 	const event = require(filePath);
 	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
+		client.once(event.name as keyof ClientEvents, (...args) => event.execute(...args));
 	} else {
-		client.on(event.name, (...args) => event.execute(...args));
+		client.on(event.name as keyof ClientEvents, (...args) => event.execute(...args));
 	}
 }
 

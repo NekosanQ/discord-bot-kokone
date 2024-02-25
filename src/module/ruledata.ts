@@ -4,6 +4,7 @@ import { config } from "../utils/config";
 interface Embeds {
     completed: EmbedBuilder,
     authenticated: EmbedBuilder,
+    failed: EmbedBuilder,
     rule: EmbedBuilder[]
 }
 
@@ -45,6 +46,10 @@ export const embeds: Embeds = {
         .setColor(Number(config.botColor))
         .setTitle("認証済み/Authenticated")
         .setDescription("あなたは認証済みです\nYou are authenticated"),
+    failed: new EmbedBuilder()
+        .setColor(Number(config.botColor))
+        .setTitle("認証失敗/Authentication failed")
+        .setDescription("認証に失敗しました。もう一度やり直してください。\nAuthentication failed. Please try again."),
     rule: [
         new EmbedBuilder()
             .setColor(Number(config.botColor))
@@ -90,7 +95,7 @@ export const embeds: Embeds = {
 }
 export const agreeButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
-        .setCustomId("agreebutton")
+        .setCustomId("agreeButton")
         .setLabel("利用規約に同意する/Agree to the rules")
         .setStyle(ButtonStyle.Success)
 )
