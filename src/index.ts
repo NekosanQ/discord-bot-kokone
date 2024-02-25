@@ -63,4 +63,4 @@ for (const file of eventFiles) {
 	}
 }
 
-client.login(process.env.KokoneToken);
+client.login(process.env.DISCORD_TOKEN);
