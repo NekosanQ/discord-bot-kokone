@@ -15,7 +15,7 @@ export async function authenticationProcess(interaction: Interaction): Promise<(
     const { body } = await request((interaction.member as GuildMember).displayAvatarURL({ extension: 'png' }));
     const avatar = await canvas.loadImage(await body.arrayBuffer());
     const context = ctx.getContext('2d');
-    context.font = "70px Yu Gothic UI";
+    context.font = "70px Noto Sans CJK JP";
         
     let authenticationCode: string;
    /**
@@ -54,14 +54,14 @@ export async function authenticationProcess(interaction: Interaction): Promise<(
     /**
      * ユーザー情報
      */
-    context.font = "30px Yu Gothic UI";
+    context.font = "30px Noto Sans CJK JP";
     context.fillStyle = "#f5f5f5";
     const member = interaction.member as GuildMember;
     context.fillText(`${member.displayName} 画像認証`, 100, 55);
     /**
      * ユーザーIDと実行時刻
      */
-    context.font = "10px Yu Gothic UI";
+    context.font = "10px Noto Sans CJK JP";
     context.fillText(`${date}-${member.id}`, 450, 250);
     
     /**

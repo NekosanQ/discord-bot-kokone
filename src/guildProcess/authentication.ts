@@ -97,7 +97,7 @@ module.exports = {
                         files: [attachment],
                         ephemeral: true
                     });
-                } else { // 認証を開始するボタンの処理
+                } else if (interaction.customId === "certificationButton") { // 認証を開始するボタンの処理
                     if (timeoutMap.has(interaction.user.id)) { // タイムアウトにしていた場合の処理
                         await interaction.reply({
                             content: "認証できません。時間を置いてやり直してください。",
