@@ -33,6 +33,7 @@ module.exports = {
             }
             cron.schedule("0 0 * * 6", async () => { // 毎週土曜日 午前0時0分 (0 0 * * 6)
                 await periodicExecution(client);
+                console.log("レベルの更新をしました");
             });
         } catch (error) {
             appendFile("logs/error.log", `[${date}] ${error}`);
