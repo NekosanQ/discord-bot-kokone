@@ -111,7 +111,7 @@ export const operationMenu: ActionRowBuilder<StringSelectMenuBuilder> = new Acti
                 description: "VCの管理権限を他の人に渡します",
                 emoji: "<:bot_14:1050454131573276712>",
                 value: "owner_change"
-            },
+            }
         )
 );
 /**

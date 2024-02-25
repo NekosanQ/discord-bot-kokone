@@ -5,9 +5,9 @@ import path from "node:path";
 import { config } from "../utils/config";
 import { writeFile } from "../module/file/writeFile";
 import { appendFile } from '../module/file/appedFile';
-// -----------------------------------------------------------------------------------------------------------
-// 毎日0時になったら処理をするシステム
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * 毎日0時になったら処理をするシステム
+ */
 module.exports = {
     async execute(client: Client): Promise<void> {
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });

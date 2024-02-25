@@ -1,9 +1,9 @@
 import { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Message } from "discord.js";
 import { config } from "../../utils/config"
 
-// -----------------------------------------------------------------------------------------------------------
-// Ping処理
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * Pingを表示する処理
+ */
 module.exports = {
     data: new SlashCommandBuilder() // スラッシュコマンド
 		.setName('ping')

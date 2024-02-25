@@ -1,6 +1,19 @@
-import { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Message, TextChannel, VoiceChannel, GuildMember, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { 
+    CommandInteraction, 
+    EmbedBuilder, 
+    SlashCommandBuilder, 
+    VoiceChannel, 
+    GuildMember, 
+    ActionRowBuilder, 
+    ButtonBuilder, 
+    ButtonStyle, 
+    PermissionsBitField
+} from "discord.js";
 import { config } from "../../utils/config"
-const mmobileChannelEmbed: EmbedBuilder = new EmbedBuilder()
+/**
+ * 
+ */
+const commandSettingChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
     .setTitle("ボイスチャンネルの設定")
     .setDescription("設定を行いたい場合、ボタンを押して設定を開始してください")
@@ -11,9 +24,9 @@ const startButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<Button
             .setLabel("設定を開始する")
             .setStyle(ButtonStyle.Success)
     )
-// -----------------------------------------------------------------------------------------------------------
-// 作成したVCの設定画面を表示する
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * コマンドで作成したVCの設定を行う処理
+ */
 module.exports = {
     data: new SlashCommandBuilder() // スラッシュコマンド
 		.setName("panel_create")
@@ -41,8 +54,19 @@ module.exports = {
                             return;
                         }
                     };
+                    // コマンドを実行したユーザーのボイスチャンネルの権限を取得
+                    const permissionOverwrites = interaction.member.voice.channel?.permissionOverwrites.cache.get(interaction.user.id);
+                    
+                    // チャンネルの権限がない場合、エラーメッセージを返す
+                    if (!permissionOverwrites || !permissionOverwrites.allow.has(PermissionsBitField.Flags.ManageChannels)) {
+                        await interaction.reply({
+                            content: "あなたにはチャンネルの設定をする権限がありません",
+                            ephemeral: true
+                        });
+                        return;
+                    }
                     await interaction.reply({
-                        embeds: [mmobileChannelEmbed],
+                        embeds: [commandSettingChannelEmbed],
                         components: [startButton]
                     });
                 }

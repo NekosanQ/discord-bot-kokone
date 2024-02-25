@@ -1,8 +1,8 @@
 import { Events, Interaction } from 'discord.js';
 import { CustomCommand } from '../types/client';
-// -----------------------------------------------------------------------------------------------------------
-// インタラクション処理
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * インタラクション処理
+ */
 module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction: Interaction): Promise<void> {

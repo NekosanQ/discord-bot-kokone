@@ -1,9 +1,9 @@
 import { Channel, EmbedBuilder, Events, GuildMember, TextChannel } from 'discord.js';
 import { config } from "../utils/config";
 import { logger } from "../utils/log";
-// -----------------------------------------------------------------------------------------------------------
-// 入室通知
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * ユーザーが入室した時の処理
+ */
 module.exports = {
 	name: Events.GuildMemberAdd,
 	async execute(member: GuildMember): Promise<void> {

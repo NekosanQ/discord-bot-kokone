@@ -1,6 +1,9 @@
 import { ActionRowBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } from "discord.js";
 import { config } from "../utils/config";
 
+/**
+ * 各埋め込みメッセージの型
+ */
 interface Embeds {
     completed: EmbedBuilder,
     authenticated: EmbedBuilder,
@@ -8,6 +11,9 @@ interface Embeds {
     rule: EmbedBuilder[]
 }
 
+/**
+ * 各言語を選択するセレクトメニュー
+ */
 export const languageMenu: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
     new StringSelectMenuBuilder()
         .setCustomId(`selectlanguage`)
@@ -37,21 +43,28 @@ export const languageMenu: ActionRowBuilder<StringSelectMenuBuilder> = new Actio
             },
         ])
 );
+/**
+ * 利用規約に使用する埋め込みメッセージ
+ */
 export const embeds: Embeds = {
+    // 利用規約に同意した場合
     completed: new EmbedBuilder()
         .setColor(Number(config.botColor))
         .setTitle("認証完了/Authentication completed")
         .setDescription("利用規約に同意しました！\n<id:customize> でロール設定を行って、自己紹介や挨拶をしましょう！"),
+    // 利用規約に同意済みの場合
     authenticated: new EmbedBuilder()
         .setColor(Number(config.botColor))
         .setTitle("認証済み/Authenticated")
         .setDescription("あなたは認証済みです\nYou are authenticated"),
+    // 認証に失敗した場合
     failed: new EmbedBuilder()
         .setColor(Number(config.botColor))
         .setTitle("認証失敗/Authentication failed")
         .setDescription("認証に失敗しました。もう一度やり直してください。\nAuthentication failed. Please try again."),
+    // 利用規約
     rule: [
-        new EmbedBuilder()
+        new EmbedBuilder() // 日本語(デフォルト)
             .setColor(Number(config.botColor))
             .setTitle("猫の隠れ家 利用規約")
             .addFields([
@@ -59,7 +72,7 @@ export const embeds: Embeds = {
                 { name: "第二条 禁止事項", value: "1. メンバー・第三者へ限度の超えた迷惑をかける・妨害をする・不快に思わせる行為\n2. 暴言・誹謗中傷等を行う行為またはその恐れの有る行為\n3. 許可のない個人情報の発言\n4. 虚偽の情報や誤解を招く発言\n5. 公序良俗に反する行為\n6. <id:guide>での禁止事項を守らない行為\n7. 許可のない宣伝及び勧誘行為\n8. 処罰されたユーザーが別アカウントで利用する行為\n9. 当鯖に関する情報を悪意を持って外部に漏らす行為\n10. 度重なる利用規約の違反\n11. 上記の行為をする又はするようにと脅す・ほのめかす行為"},
                 { name: "第三条 罰則", value: "1. 注意\n2. 警告\n3. メッセージ削除\n4. タイムアウト\n5. 役職剥奪\n6. キック\n7. BAN"},
             ]),
-        new EmbedBuilder()
+        new EmbedBuilder() // 英語
             .setColor(Number(config.botColor))
             .setTitle("CatHideaway Terms of Service")
             .addFields([
@@ -67,7 +80,7 @@ export const embeds: Embeds = {
                 { name: "Article 2 Prohibited Matters", value: "1. Acts that cause undue inconvenience, disturbance, or discomfort to members or third parties.\n2. Acts that are or may be abusive, slanderous, or defamatory\n3. Statements of personal information without authorization\n4. False information or misleading statements\n5. Acts against public order and morals\n6. failure to comply with the prohibitions in <id:guide>\n7. Unauthorized advertising and solicitation\n8. Use of another account by the punished user\n9. Maliciously leaking information about this server to outside parties\n10. Repeated violations of the Terms of Use\n11. Threatening or insinuating to commit any of the above acts" },
                 { name: "Article 3 Penalties", value: "1. Caution\n2. Warning\n3. Message Deletion\n4. timeout\n5. role deprivation\n6. kick\n7. BAN" },
             ]),
-        new EmbedBuilder()
+        new EmbedBuilder() // 中国語(繁体字)
             .setColor(Number(config.botColor))
             .setTitle("CatHideaway 使用條款")
             .addFields([
@@ -75,7 +88,7 @@ export const embeds: Embeds = {
                 { name: "第二条 禁止事項", value: "1. 造成會員或第三人不當不便、幹擾或不適的行為。\n2. 屬於或可能屬於辱罵、誹謗或誹謗的行為\n3. 未經授權的個人資訊陳述\n4. 虛假資訊或誤導性陳述\n5. 違反公共秩序和道德的行為\n6. 未能遵守<id:guide>中的禁令\n7. 未經授權的廣告和招攬\n8. 受懲罰使用者使用另一個帳戶\n9. 惡意向外部各方洩露有關此伺服器的資訊\n10. 屢次違反使用條款\n11. 威脅或暗示實施上述任何行為" },
                 { name: "第三條 處罰", value: "1. 注意\n2. 警告\n3. 訊息刪除\n4. 超時\n5. 角色剝奪\n6. 踢\n7. 禁止" },
             ]),
-        new EmbedBuilder()
+        new EmbedBuilder() // 中国語(簡体字)
             .setColor(Number(config.botColor))
             .setTitle("CatHideaway 使用条款")
             .addFields([
@@ -83,7 +96,7 @@ export const embeds: Embeds = {
                 { name: "第二条 禁止事项", value: "1. 给会员或第三方造成不当不便、干扰或不适的行为。\n2. 属于或可能属于辱骂、诽谤或诽谤的行为\n3. 未经授权的个人信息陈述\n4. 虚假信息或误导性陈述\n5. 违反公共秩序和道德的行为\n6. 未能遵守<id:guide>中的禁令\n7. 未经授权的广告和招揽\n8. 受惩罚用户使用另一个帐户\n9. 恶意向外部各方泄露有关此服务器的信息\n10. 屡次违反使用条款\n11. 威胁或暗示实施上述任何行为" },
                 { name: "第三条 处罚", value: "1. 注意\n2. 警告\n3. 消息删除\n4. 超时\n5. 角色剥夺\n6. 踢\n7. 禁止" },
             ]),
-        new EmbedBuilder()
+        new EmbedBuilder() // 韓国語
             .setColor(Number(config.botColor))
             .setTitle("CatHideaway 이용 규약")
             .addFields([
@@ -93,6 +106,9 @@ export const embeds: Embeds = {
             ])
     ]
 }
+/**
+ * 利用規約に同意するボタン
+ */
 export const agreeButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId("agreeButton")

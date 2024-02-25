@@ -1,8 +1,8 @@
 import { Events, Message, PermissionsBitField } from 'discord.js';
 import { appendFile } from '../module/file/appedFile';
-// -----------------------------------------------------------------------------------------------------------
-// メッセージ処理
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * メッセージ処理
+ */
 module.exports = {
     name: Events.MessageCreate,
     async execute(message: Message): Promise<void> {

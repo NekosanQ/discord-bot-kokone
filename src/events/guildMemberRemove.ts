@@ -2,9 +2,9 @@ import { Channel, EmbedBuilder, Events, GuildMember, TextChannel } from 'discord
 import { config } from "../utils/config";
 import { logger } from "../utils/log";
 
-// -----------------------------------------------------------------------------------------------------------
-// 退室通知
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * ユーザーが退出した時の処理
+ */
 module.exports = {
 	name: Events.GuildMemberRemove,
 	async execute(member: GuildMember): Promise<void> {

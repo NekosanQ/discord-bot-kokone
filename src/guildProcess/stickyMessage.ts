@@ -1,13 +1,14 @@
 import { EmbedBuilder, Message } from "discord.js";
 import { appendFile } from "../module/file/appedFile";
 import { config } from '../utils/config';
-// -----------------------------------------------------------------------------------------------------------
-// Stickyメッセージ
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * Stickyメッセージ
+ */
 module.exports = {
     async execute(message: Message): Promise<void> {
         if (message.author.bot) return;
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+
         const inviteStickyMessage: EmbedBuilder = new EmbedBuilder()
             .setColor(Number(config.botColor))
             .setTitle("募集チャンネルについて")
@@ -15,7 +16,7 @@ module.exports = {
             
         if (config.inviteChannelId.includes(message.channel.id)) {
             try {
-                const fetchedMessages = await message.channel.messages.fetch();
+                const fetchedMessages = await message.channel.messages.fetch(); // メッセージ取得
                 const stickyMessage = fetchedMessages.find(message => message.author.id === message.client.user.id && config.inviteChannelId.includes(message.channel.id));
 
                 if (stickyMessage) {
@@ -23,13 +24,13 @@ module.exports = {
                         message.channel.send({
                             embeds: [inviteStickyMessage]
                         });
-                    }).catch(() => {});
+                    }).catch(() => {})
                 } else {
                     // Stickyメッセージが無い場合
                     message.channel.send({
                         embeds: [inviteStickyMessage]
                     });
-                };
+                }
             } catch (error) {
                 appendFile("logs/error.log", `[${date}] ${error}`);
             }

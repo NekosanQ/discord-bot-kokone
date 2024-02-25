@@ -1,4 +1,7 @@
 import { CommandInteraction, SlashCommandBuilder, } from "discord.js";
+/**
+ * ログを送信するコマンド
+ */
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("log")

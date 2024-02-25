@@ -2,9 +2,9 @@ import { Collection, EmbedBuilder, GuildMember, Message, PermissionsBitField, Ro
 import { setTimeout } from 'node:timers/promises';
 import { appendFile } from "../module/file/appedFile";
 import { config } from '../utils/config.js';
-// -----------------------------------------------------------------------------------------------------------
-// 荒らし対策システム
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * 荒らし対策システム
+ */
 module.exports = {
     async execute(message: Message): Promise<void> {
         class DefaultEmbeds {
@@ -21,15 +21,15 @@ module.exports = {
                         { name: "処罰ユーザーID", value: `${message.author.id}` }
                     ])
                 return embed;
-            };
-        };
+            }
+        }
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         const timeoutEmbed = new DefaultEmbeds("タイムアウトされました");
         const member: GuildMember | undefined = message.guild?.members.cache.get(message.author.id); 
-        // -----------------------------------------------------------------------------------------------------------
-        // 募集チャンネルで、通話募集通知以外でのメンションをした場合の処理
-        // (ユーザーへのメンションは処理しない)
-        // -----------------------------------------------------------------------------------------------------------
+        /**
+         * 募集チャンネルで、通話募集通知以外でのメンションをした場合の処理
+         * (ユーザーへのメンションは処理しない)
+         */
         const messageRole: Collection<string, Role> = message.mentions.roles; // メッセージに含まれているメンションを取得
         if (message.channel.id == config.inviteChannelId && message.content.match("@")) {
             const voiceChannel = message.member?.voice.channel;
@@ -60,7 +60,7 @@ module.exports = {
                     await errorMessageSend.delete();
                     return;
                 }
-                if (!voiceChannel) {
+                if (!voiceChannel) { // ユーザーがボイスチャンネルいない場合の処理
                     const errorMessage: string = "ボイスチャンネルにいないユーザーのメンションを検出しました";
                     appendFile("logs/violation.log", `[${date}] ${errorMessage} <違反ユーザー/ID>: <違反ユーザー表示名/名前/ID>: ${message.author.displayName}/${message.author.username}/${message.author.id}\n`);
                     const errorMessageSend: Message = await message.channel.send(`${errorMessage}`);
@@ -72,11 +72,11 @@ module.exports = {
             } catch (error) {
                 appendFile("logs/error.log", `[${date}] ${error}`);
             }
-        };
-        // ------------------------------------------------------------------------------------------------------------
-        // 全体メンションをした場合の処理
-        // 対象: @everone / @here
-        // -----------------------------------------------------------------------------------------------------------
+        }
+        /**
+         * 全体メンションをした場合の処理
+         * 対象: @everone / @here
+         */
         if (message.mentions.everyone&&!member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
             try {
                 const MentionMessage: Message = await message.channel.send({
@@ -90,11 +90,11 @@ module.exports = {
                 await MentionMessage.delete();
             } catch (error) {
                 appendFile("logs/error.log", `[${date}] ${error}`);
-            };
-        };
-        // -----------------------------------------------------------------------------------------------------------
-        // 個人メンションが３つ以上送信された場合の処理
-        // -----------------------------------------------------------------------------------------------------------
+            }
+        }
+        /**
+         * 個人メンションが３つ以上送信された場合の処理
+         */
         if (message.mentions.members != null&&message.mentions.members.size >= 3&&!member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
             try {
                 await message.delete(); 
@@ -106,11 +106,11 @@ module.exports = {
                 });
             } catch (error) {
                 appendFile("logs/error.log", `[${date}] ${error}`);
-            };
-        };
-        // -----------------------------------------------------------------------------------------------------------
-        // チケットチャンネルでメッセージが送信されたらログに保存する処理
-        // -----------------------------------------------------------------------------------------------------------
+            }
+        }
+        /**
+         * チケットチャンネルでメッセージが送信されたらログに保存する処理
+         */
         const channel = message.channel;
         if (channel.type === 0) {
             try {
@@ -118,10 +118,10 @@ module.exports = {
                 const messageCategoryId = channel.parent?.id;
                 if (messageCategoryId === ticketCateforyId) {
                     appendFile("logs/ticket.log", `[${date}] <${message.author.displayName}/${message.author.id}> <${channel.name}/${channel.id}>\n${message.content}\n`);
-                };
+                }
             } catch (error) {
                 appendFile("logs/error.log", `[${date}] ${error}`);
             }
-        };
+        }
     }
 };

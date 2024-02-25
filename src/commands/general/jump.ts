@@ -1,23 +1,25 @@
 import { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Message, TextChannel, VoiceChannel } from "discord.js";
 import { config } from "../../utils/config"
 
-// -----------------------------------------------------------------------------------------------------------
-// 作成したVCの設定画面のメッセージリンクを送信する処理
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * 作成したVCの設定画面のメッセージリンクを送信する処理
+ */
 module.exports = {
     data: new SlashCommandBuilder() // スラッシュコマンド
 		.setName("jump")
 		.setDescription("作成したVCの設定画面のメッセージリンクを送信します"),
     async execute(interaction: CommandInteraction) {
         try {
-            if (interaction.channel instanceof TextChannel) { // テキストチャンネルでは処理をしない
+             // テキストチャンネルでは処理をしない
+            if (interaction.channel instanceof TextChannel) {
                 await interaction.reply({
                     content: "テキストチャンネルでは実行できません",
                     ephemeral: true
                 });
             } else { 
                 const channel = interaction.channel as VoiceChannel;
-                for (let i = 0; config.defaultVoiceChannelList.length > i; i++) { // 標準であるボイスチャンネルで実行していたら処理を終了する
+                // 標準であるボイスチャンネルで実行していたら処理を終了する
+                for (let i = 0; config.defaultVoiceChannelList.length > i; i++) {
                     if (channel.id == config.defaultVoiceChannelList[i]) {
                         interaction.reply({
                             content: "作成したVC以外では実行できません",
@@ -26,9 +28,9 @@ module.exports = {
                         return;
                     };
                 };
-                // -----------------------------------------------------------------------------------------------------------
-                // チャンネルの最初のメッセージを取得する処理
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * チャンネルの最初のメッセージを取得する処理
+                 */
                 await interaction.deferReply({ 
                     ephemeral: false
                 });

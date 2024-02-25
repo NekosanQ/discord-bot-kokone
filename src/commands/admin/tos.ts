@@ -11,6 +11,7 @@ module.exports = {
         .setDescription("利用規約を作成します"),
     async execute(interaction: Interaction<"cached">): Promise<void> {
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+        
         if (interaction.isChatInputCommand()&&interaction.member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
             await interaction.reply({
                 embeds: [embeds.rule[0]],
@@ -18,9 +19,9 @@ module.exports = {
             });
             return;
         }
-        // -----------------------------------------------------------------------------------------------------------
-        // 利用規約に同意/言語を選択した時の処理
-        // -----------------------------------------------------------------------------------------------------------
+        /**
+         * 利用規約に同意/言語を選択した時の処理
+         */
         if (!interaction.isStringSelectMenu()&&!interaction.isButton()) return;
         if (interaction.customId === "selectlanguage") { // 言語を選択した時の処理
             const page: number = Number((interaction as StringSelectMenuInteraction).values[0].split("_")[1]);

@@ -1,8 +1,8 @@
 import { Events, VoiceState, } from "discord.js";
 import { appendFile } from '../module/file/appedFile';
-// -----------------------------------------------------------------------------------------------------------
-// ボイスチャンネル処理
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * ボイスチャンネルの処理
+ */
 module.exports = {
     name: Events.VoiceStateUpdate,
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {

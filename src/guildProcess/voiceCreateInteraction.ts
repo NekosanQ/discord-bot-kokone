@@ -4,13 +4,9 @@ import {
     Interaction, 
     ModalBuilder, 
     ModalSubmitInteraction, 
-    StringSelectMenuInteraction, 
     TextInputBuilder, 
     TextInputStyle, 
-    VoiceChannel, 
     PermissionsBitField,
-    CacheType,
-    User,
     GuildMember
 } from "discord.js";
 import { MenuInteraction, 
@@ -25,27 +21,42 @@ import { MenuInteraction,
 import { config } from "../utils/config";
 import { PrismaClient } from "@prisma/client";
 import { appendFile } from "../module/file/appedFile";
+/**
+ * データベースのインスタンス
+ */
 const prisma = new PrismaClient();
-
+/**
+ * チャンネルを編集した時に表示する埋め込みメッセージ
+ */
 const editChannelEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
     .setTitle("ボイスチャンネルの設定を変更しました")
-    .setDescription("設定を行いたい場合、下のメニューから設定を行ってください。")
-
+    .setDescription("設定を行いたい場合、下のメニューから設定を行ってください。");
+/**
+ * チャンネル名を変更する際に使用するモーダル
+ */
 const changeNameModal: ModalBuilder = new ModalBuilder()
 	.setCustomId("changeNameModal")
 	.setTitle("チャンネル名の変更");
+/**
+ * 変更したいチャンネル名を入力する画面
+ */
 const changeNameInput: TextInputBuilder = new TextInputBuilder()
     .setMaxLength(20)
     .setMinLength(1)
     .setCustomId("changeNameInput")
     .setLabel("変更するチャンネル名を入力してください")
     .setPlaceholder("20文字までです")
-    .setStyle(TextInputStyle.Short)
-
+    .setStyle(TextInputStyle.Short);
+/**
+ * 人数制限を変更する際に使用するモーダル
+ */
 const changePeopleLimitedModal: ModalBuilder = new ModalBuilder()
     .setCustomId("changePeopleLimitedModal")
     .setTitle("人数制限の変更");
+/**
+ * 変更する人数制限を入力する画面
+ */
 const changePeopleLimitedInput: TextInputBuilder = new TextInputBuilder()
     .setMaxLength(2)
     .setMinLength(1)
@@ -53,11 +64,15 @@ const changePeopleLimitedInput: TextInputBuilder = new TextInputBuilder()
     .setLabel("変更する人数を入力してください")
     .setPlaceholder("0~99人までです(0人の場合は無制限になります)")
     .setStyle(TextInputStyle.Short)
-
+/**
+ * ビットレートを変更する際に使用するモーダル
+ */
 const changeBitrateModal: ModalBuilder = new ModalBuilder()
     .setCustomId("changeBitrateModal")
     .setTitle("ビットレートの変更");
-      
+/**
+ * 変更するビットレートを入力する画面
+ */
 const changeBitrateInput: TextInputBuilder = new TextInputBuilder()
     .setMaxLength(3)
     .setMinLength(1)
@@ -65,20 +80,24 @@ const changeBitrateInput: TextInputBuilder = new TextInputBuilder()
     .setLabel("変更するビットレート数を入力してください")
     .setPlaceholder("8~384Kbpsまでです(64kbps以下は非推奨です)")
     .setStyle(TextInputStyle.Short)
-
+/**
+ * チャンネル名を変更する際に使用するコンポーネント
+ */
 const changeNameRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(changeNameInput);
 changeNameModal.addComponents(changeNameRow);
-
+/**
+ * 人数制限を変更する際に使用するコンポーネント
+ */
 const changePeopleLimitedRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(changePeopleLimitedInput);
 changePeopleLimitedModal.addComponents(changePeopleLimitedRow);
-
+/**
+ * ビットレートを変更する際に使用するコンポーネント
+ */
 const changeBitrateRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(changeBitrateInput);
 changeBitrateModal.addComponents(changeBitrateRow);
 
-// -----------------------------------------------------------------------------------------------------------
-// ボイスチャンネル作成のインタラクション処理
-// -----------------------------------------------------------------------------------------------------------
 /**
+ * ボイスチャンネル作成のインタラクション処理
  * @param interaction インタラクション
  */
 module.exports = {
@@ -90,8 +109,11 @@ module.exports = {
             if (!interaction.isButton() && !interaction.isStringSelectMenu() && !interaction.isModalSubmit() && !interaction.isUserSelectMenu()) return;
             const channel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
             if (!channel) return;
+
+            // チャンネル内のユーザー権限を取得
             const permissionOverwrites = channel.permissionOverwrites.cache.get(interaction.user.id);
 
+            // チャンネルの権限がない場合、エラーメッセージを返す
             if (!permissionOverwrites || !permissionOverwrites.allow.has(PermissionsBitField.Flags.ManageChannels)) {
                 await interaction.reply({
                     content: "あなたにはチャンネルの設定をする権限がありません",
@@ -99,20 +121,22 @@ module.exports = {
                 });
                 return;
             }
-            
+            /**
+             * チャンネルの設定
+             */
             switch (interaction.customId) {
-                // -----------------------------------------------------------------------------------------------------------
-                // チャンネルの公開/設定の開始
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * チャンネルの公開/設定の開始/ブロックユーザーの確認
+                 */
                 case "publicButton":
                 case "startButton":
                 case "confirmationButton": {
                     await require("../guildProcess/voicePublic").execute(interaction);
                     break;
                 }
-                // -----------------------------------------------------------------------------------------------------------
-                // チャンネルのロック
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * チャンネルのロック
+                 */
                 case "lockButton": {
                     await interaction.deferReply({ 
                         ephemeral: true
@@ -125,9 +149,9 @@ module.exports = {
                     });
                     break;
                 }
-                // -----------------------------------------------------------------------------------------------------------
-                // チャンネルのロック解除
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * チャンネルのロック解除
+                 */
                 case "unLockButton": {
                     await interaction.deferReply({ 
                         ephemeral: true 
@@ -140,9 +164,9 @@ module.exports = {
                     });
                     break;
                 }
-                // -----------------------------------------------------------------------------------------------------------
-                // 更新ボタン
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * 更新ボタン
+                 */
                 case "reloadButton": {
                     await interaction.reply({ 
                         content: "設定画面を更新しました",
@@ -150,26 +174,30 @@ module.exports = {
                     });
                     break;
                 }
-                // -----------------------------------------------------------------------------------------------------------
-                // チャンネルの設定
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * チャンネルの設定
+                 */
                 case "operationMenu": {
                     if (!interaction.isStringSelectMenu()) return;
                     const operationPage = interaction.values[0].split("_")[0];
                     switch (operationPage) {
-                        case "name": { // 名前の変更
+                        // 名前の変更
+                        case "name": {
                             await interaction.showModal(changeNameModal);
                             break;
                         }
-                        case "peopleLimited": { // 人数制限の変更
+                        // 人数制限の変更
+                        case "peopleLimited": {
                             await interaction.showModal(changePeopleLimitedModal);
                             break;
                         }
-                        case "bitrate": { // ビットレートの変更
+                        // ビットレートの変更
+                        case "bitrate": {
                             await interaction.showModal(changeBitrateModal);
                             break;
                         }
-                        case "owner": { // VCのオーナーの変更
+                        // VCのオーナーの変更
+                        case "owner": {
                             await interaction.reply({
                                 embeds: [transferOwnershipEmbed],
                                 components: [transferOwnershipMenu],
@@ -180,9 +208,9 @@ module.exports = {
                     }
                     break;
                 }
-                // -----------------------------------------------------------------------------------------------------------
-                // チャンネル名の変更
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * チャンネル名の変更
+                 */
                 case "changeNameModal": {
                     if (!interaction.isModalSubmit()) return;
                     const voiceChannel = interaction.member instanceof GuildMember ? interaction.member?.voice.channel : null;
@@ -198,10 +226,9 @@ module.exports = {
                     });
                     break;
                 }
-                
-                // -----------------------------------------------------------------------------------------------------------
-                // 人数制限の変更
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * 人数制限の変更
+                 */
                 case "changePeopleLimitedModal": {
                     if (!interaction.isModalSubmit()) return;
                     await interaction.deferReply({ 
@@ -230,9 +257,9 @@ module.exports = {
                     }
                     break;
                 }
-                // -----------------------------------------------------------------------------------------------------------
-                // ビットレートの変更
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * ビットレートの変更
+                 */
                 case "changeBitrateModal": {
                     if (!interaction.isModalSubmit()) return;
                     await interaction.deferReply({ 
@@ -260,9 +287,9 @@ module.exports = {
                     }
                     break;
                 }
-                // -----------------------------------------------------------------------------------------------------------
-                // VCの譲渡
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * VCの譲渡
+                 */
                 case "transferOwnership": {
                     if (!interaction.isUserSelectMenu()) return;
                     // 譲渡先のユーザーを取得
@@ -293,7 +320,6 @@ module.exports = {
                         });
                         return;
                     }
-
                     // 譲渡先のユーザーがVCに入っているか確認
                     if (newOwner.voice.channelId !== channel.id) {
                         await interaction.reply({
@@ -302,7 +328,6 @@ module.exports = {
                         });
                         return;
                     }
-
                     await interaction.deferReply({ ephemeral: true });
 
                     // チャンネルのオーナーを変更
@@ -315,9 +340,9 @@ module.exports = {
 
                     break;
                 }
-                // -----------------------------------------------------------------------------------------------------------
-                // ユーザーのブロック
-                // -----------------------------------------------------------------------------------------------------------
+                /**
+                 * ユーザーのブロック
+                 */
                 case "userBlockList": {
                     if (!interaction.isUserSelectMenu()) return;
                     await interaction.deferReply({ 

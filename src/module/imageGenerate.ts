@@ -2,6 +2,9 @@ import { Interaction, AttachmentBuilder, GuildMember } from "discord.js";
 import canvas from '@napi-rs/canvas';
 import { request } from 'undici';
 import crypto from 'crypto';
+/**
+ * 認証コードを保存するマップ
+ */
 export const authenticationMap = new Map<string, string>();
 
 export async function authenticationProcess(interaction: Interaction): Promise<(string | AttachmentBuilder)[]> {

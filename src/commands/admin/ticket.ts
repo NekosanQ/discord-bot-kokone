@@ -33,9 +33,9 @@ const deleteButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<Butto
         .setLabel("チャンネルを削除する")
         .setStyle(ButtonStyle.Danger)
 )
-// -----------------------------------------------------------------------------------------------------------
-// お問い合わせ作成
-// -----------------------------------------------------------------------------------------------------------
+/**
+ * お問い合わせの処理
+ */
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("ticket")
@@ -49,73 +49,74 @@ module.exports = {
             });
             return;
         }
-        // -----------------------------------------------------------------------------------------------------------
-        // お問い合わせを作成した時の処理
-        // -----------------------------------------------------------------------------------------------------------
+        
         if (!interaction.isButton()) return;
+        /**
+         * お問い合わせを作成した時の処理
+         */
         if (interaction.customId === "ticketbutton") {
             const ticketChannelName = `お問い合わせ-${interaction.user.id}`;
             const channel: Channel | undefined = interaction.client.channels.cache.find((channel: Channel) => (channel as WidgetChannel).name === ticketChannelName);
             const operationRoleId = "970250087089438740";
+
             if (channel) {
                 interaction.reply({
                     content: "既にあなたはお問い合わせを作成しています",
                     ephemeral: true
                 })
-            } else {
-                if (interaction.customId === "ticketbutton") { // お問い合わせ時の処理
-                    appendFile("logs/ticket.log", `[${date}] お問い合わせを作成しました <実行ユーザー表示名/名前/ID> ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
-                    await interaction.guild.channels.create({
-                        name: ticketChannelName,
-                        parent: "1153219622036848660",
-                        permissionOverwrites: [
-                            {
-                                id: interaction.guild.id,
-                                deny: [
-                                    PermissionsBitField.Flags.ViewChannel
-                                ]
-                            },
-                            {
-                                id: operationRoleId,
-                                allow: [allowPermisson]
-                            },
-                            {
-                                id: interaction.user.id,
-                                allow: [allowPermisson]
-                            }
-                        ]
+            } else { // お問い合わせ時の処理
+                appendFile("logs/ticket.log", `[${date}] お問い合わせを作成しました <実行ユーザー表示名/名前/ID> ${interaction.user.displayName}/${interaction.user.username}/${interaction.user.id}\n`);
+                await interaction.guild.channels.create({
+                    name: ticketChannelName,
+                    parent: "1153219622036848660",
+                    permissionOverwrites: [
+                        {
+                            id: interaction.guild.id,
+                            deny: [PermissionsBitField.Flags.ViewChannel]
+                        },
+                        {
+                            id: operationRoleId,
+                            allow: [allowPermisson]
+                        },
+                        {
+                            id: interaction.user.id,
+                            allow: [allowPermisson]
+                        }
+                    ]
+                });
+                const channel: Channel | undefined = interaction.client.channels.cache.find((channel: Channel) => (channel as WidgetChannel).name === ticketChannelName);
+                if (channel) {
+                    (channel as TextChannel).send({
+                        content: `<@${interaction.user.id}>`,
+                        embeds: [channelCreateEmbed],
+                        components: [deleteButton]
                     });
-                    const channel: Channel | undefined = interaction.client.channels.cache.find((channel: Channel) => (channel as WidgetChannel).name === ticketChannelName);
-                    if (channel) {
-                        (channel as TextChannel).send({
-                            content: `<@${interaction.user.id}>`,
-                            embeds: [channelCreateEmbed],
-                            components: [deleteButton]
-                        });
-                        await interaction.reply({
-                            content: `<#${channel.id}>を作成しました。`,
-                            ephemeral: true
-                        });
-                        setTimeout(() => {
-                            if (channel.type === 0) { // テキストチャンネルかどうかを判別
-                                // 最新のメッセージを取得する
-                                channel.messages.fetch({ limit: 1 }).then(messages => {
-                                    const lastMessageUser = messages.first()?.author.bot; // BOTかどうか
-                                    if (lastMessageUser) { // BOTだったら、チャンネルを削除
-                                        appendFile("logs/ticket.log", `[${date}] １時間メッセージが送信されていないので、チャンネルを削除しました <チャンネル名/ID>: ${channel.name}/${channel.id}\n`);
-                                        channel.delete();
-                                    };
-                                }).catch(error => { // チャンネルを削除されていた場合、処理をしない
-                                    appendFile("logs/error.log", `[${date}] ${error}`);
-                                });
-                            }
-                        }, 1000 * 60 * 60);
-                    } else {
-                        console.log("作成したお問い合わせチャンネルにメッセージを送信できませんでした")
-                    };
+                    await interaction.reply({
+                        content: `<#${channel.id}>を作成しました。`,
+                        ephemeral: true
+                    });
+                    setTimeout(() => {
+                        if (channel.type === 0) { // テキストチャンネルかどうかを判別
+                            // 最新のメッセージを取得する
+                            channel.messages.fetch({ limit: 1 }).then(messages => {
+                                const lastMessageUser = messages.first()?.author.bot; // BOTかどうか
+                                if (lastMessageUser) { // BOTだったら、チャンネルを削除
+                                    appendFile("logs/ticket.log", `[${date}] １時間メッセージが送信されていないので、チャンネルを削除しました <チャンネル名/ID>: ${channel.name}/${channel.id}\n`);
+                                    channel.delete();
+                                };
+                            }).catch(error => { // チャンネルを削除されていた場合、処理をしない
+                                appendFile("logs/error.log", `[${date}] ${error}`);
+                            })
+                        }
+                    }, 1000 * 60 * 60);
+                } else {
+                    console.log("作成したお問い合わせチャンネルにメッセージを送信できませんでした")
                 }
             }
         }
+        /**
+         * お問い合わせを削除する処理
+         */
         if (interaction.customId === "deletebutton_ticket") {
             const channelId: string | undefined = interaction.channel?.id;
             if(channelId) {
