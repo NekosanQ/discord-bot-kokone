@@ -67,18 +67,29 @@ module.exports = {
             .setImage(`attachment://${interaction.user.id}.png`)
 
         if (interaction.isButton()) { // ボタンを押したときの処理
+            let authenticationCode = authenticationMap.get(interaction.user.id); // 認証コードを取得
+
+            // 認証済みの場合、処理をしない
+            if (authenticationCode === "authenticated") {
+                await interaction.reply({
+                    content: "認証済みです",
+                    ephemeral: true
+                });
+                return;
+            }
+
             if (["agreeButton", "changeButton"].includes(interaction.customId)) { // 認証を開始させるボタン
                 const authenticationArray = await authenticationProcess(interaction);
-                const authenticationCode = authenticationArray[0] as string; // 認証コード
+                authenticationCode = authenticationArray[0] as string; // 認証コード
                 const attachment = authenticationArray[1]; // 認証画像
                 authenticationMap.set(interaction.user.id, authenticationCode); // 認証コードをセット
                 timeoutCountMap.set(interaction.user.id, 3); // 失敗回数
                 const timeout = setTimeout(() => { // 5分後に処理するタイムアウトを作成
                     logger.info(`認証コードをリセットしました: ${interaction.user.displayName}/${interaction.user.id}`);
-                    authenticationMap.set(interaction.user.id, "timeout"); // 認証コードをセット
+                    authenticationMap.set(interaction.user.id, "timeout"); // 認証コードをtimeoutし無効化
                     timeoutMap.delete(interaction.user.id); // タイムアウトの削除
                 }, 5 * 60 * 1000);
-                resetMap.set(interaction.user.id, timeout )
+                resetMap.set(interaction.user.id, timeout)
 
                 await interaction.reply({ // 認証画面表示
                     embeds: [certificationEmbed],
@@ -87,7 +98,7 @@ module.exports = {
                     ephemeral: true
                 });
             } else { // 認証を開始するボタンの処理
-                if (timeoutMap.has(interaction.user.id)) { // タイムアウトにしていた場合の処理
+                 if (timeoutMap.has(interaction.user.id)) { // タイムアウトにしていた場合の処理
                     await interaction.reply({
                         content: "認証できません。時間を置いてやり直してください。",
                         ephemeral: true
@@ -113,6 +124,7 @@ module.exports = {
                     });
                     await interaction.member.roles.remove(config.uncertifiedRoleId); // 未認証ロールを削除
                     await interaction.member.roles.add(config.authenticatedRoleId); // 認証済ロールを付与
+                    authenticationMap.set(interaction.user.id, "authenticated"); // 認証済みにする
                     await interaction.editReply({
                         embeds: [embeds.completed]
                     });
