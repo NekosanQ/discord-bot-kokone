@@ -31,6 +31,10 @@ module.exports = {
         if (coolDowndate) return; // クールダウン中の場合、処理しない
 
         let xp: number = 0;
+        let isVoiceChannel: boolean = false;
+        if (message.member?.voice.channel) {
+            isVoiceChannel = true;
+        }
 
         const user = await prisma.levels.findFirst({
            select: {
@@ -44,7 +48,7 @@ module.exports = {
             const boostCount = messageBonusMap.get(message.author.id) || 0;
             const isBoosting = boostCount < 10; // ブースト回数 10回以下でtrue
 
-            xp = grantXP(message.author.id, user.user_xp, boostCount, isBoosting);
+            xp = grantXP(message.author.id, user.user_xp, boostCount, isBoosting, isVoiceChannel);
 
             await prisma.levels.updateMany({
                 where: { user_id: String(message.author.id) },
@@ -53,7 +57,7 @@ module.exports = {
 
             grantRole(message.author.id, message.guild, user.user_xp + xp);
         } else { // データがない場合、新規作成
-            xp = grantXP(message.author.id, 0, 0, true);
+            xp = grantXP(message.author.id, 0, 0, true, isVoiceChannel);
 
             await prisma.levels.create({
                 data: {
@@ -87,16 +91,19 @@ module.exports = {
  * @param xp 実行ユーザー経験値
  * @param boostCount ブースト回数
  * @param isBoosting ブースト有効の可否
+ * @param isVoiceChannel
  */
-function grantXP(userId: string, xp: number, boostCount: number, isBoosting: boolean) : number {
-    let earnExp: number = Math.floor(Math.random() * 20) + 1;   // 獲得経験値。 1 - 20
+function grantXP(userId: string, xp: number, boostCount: number, isBoosting: boolean, isVoiceChannel: boolean) : number {
+    let earnExp: number = Math.floor(Math.random() * 50) + 1;   // 獲得経験値。 1 - 50
     earnExp = isBoosting ? earnExp * 5 : earnExp;               // ブースト有効時は5倍
+    if (isVoiceChannel) {
+        earnExp = Math.floor(Math.random() * 10) + 1;
+    }
     
     if (isBoosting) { // ブースト有効
         messageBonusMap.set(userId, boostCount + 1);
         console.log(`[ボーナス] user_id=${userId} 回数更新, 現在: ${messageBonusMap.get(userId)}`);
     }
-
     let earnedXp: number = earnedXpMap.get(userId) || 0; // 1週間に稼いだ経験値
     earnedXpMap.set(userId, earnedXp + earnExp);
 
