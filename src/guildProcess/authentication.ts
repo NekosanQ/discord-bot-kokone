@@ -128,7 +128,7 @@ module.exports = {
                         ephemeral: true
                     });
                 } else { // 試行回数がもうない場合の処理
-                    const timeout = setTimeout(() => { // 5分後に処理するタイムアウトを作成
+                    const timeout = setTimeout(() => { // 10分後に処理するタイムアウトを作成
                         logger.info(`認証タイムアウト解除: ${interaction.user.displayName}/${interaction.user.id}`);
                         timeoutMap.delete(interaction.user.id); // タイムアウトの削除
                     }, 10 * 60 * 1000);
