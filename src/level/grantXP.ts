@@ -1,7 +1,7 @@
 import { vcBonusMap, earnedXpMap } from "../module/periodicExecution";
 
 /**
- * 経験値を付与します。
+ * 経験値を付与する。
  * @param userId 実行ユーザーID
  * @param joinedTime VC参加時刻(UNIX Time)
  * @param leftTime  VC離脱時刻(UNIX Time)
@@ -18,7 +18,7 @@ export function grantXP(userId: string, joinedTime: number, leftTime: number, is
     vcBonus += Math.min(connectionTime, maxConnectionTime);
     vcBonusMap.set(userId, vcBonus); // 接続時間更新
 
-    const earnExp = calculateEarnExp(connectionTime, isBonus);
+    const earnExp = calculateEarnExp(connectionTime, isBonus); //  VCにいた分の取得経験値
     const totalEarnedExp: number = (earnedXpMap.get(userId) || 0) + earnExp; // 今まで獲得した経験値取得(1週間分)
     earnedXpMap.set(userId, totalEarnedExp);
 

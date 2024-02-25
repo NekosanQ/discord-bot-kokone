@@ -21,17 +21,17 @@ module.exports = {
     async execute(message: Message): Promise<void> {
         if (message.author.bot) return;
 
-        if (message.guild === null) return; // NOTE: 実行場所がサーバーでなかったら無視
+        if (message.guild === null) return; // 実行場所がサーバーでなかったら処理しない
 
         const now = Date.now();
         const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         
         const coolDowndate = coolDownMap.get(message.author.id);
 
-        if (coolDowndate) // NOTE: クールダウン中
-            return;
+        if (coolDowndate) return; // クールダウン中の場合、処理しない
 
         let xp: number = 0;
+
         const user = await prisma.levels.findFirst({
            select: {
                 user_id: true,
@@ -40,7 +40,7 @@ module.exports = {
             where: { user_id: message.author.id }
         });
 
-        if (user) { // 更新
+        if (user) { // データがある場合、更新する
             const boostCount = messageBonusMap.get(message.author.id) || 0;
             const isBoosting = boostCount < 10; // ブースト回数 10回以下でtrue
 
@@ -52,7 +52,7 @@ module.exports = {
             });
 
             grantRole(message.author.id, message.guild, user.user_xp + xp);
-        } else { // 新規作成
+        } else { // データがない場合、新規作成
             xp = grantXP(message.author.id, 0, 0, true);
 
             await prisma.levels.create({
@@ -65,7 +65,7 @@ module.exports = {
             grantRole(message.author.id, message.guild, xp);
         }
 
-        coolDownMap.set(message.author.id, now); // NOTE: クールダウンの処理 5秒
+        coolDownMap.set(message.author.id, now); // 5秒のクールダウンを入れる
 
         setTimeout(() => {
             coolDownMap.delete(message.author.id);
@@ -82,7 +82,7 @@ module.exports = {
 };
 
 /**
- * 経験値を付与します。
+ * 経験値の付与
  * @param userId ユーザーId
  * @param xp 実行ユーザー経験値
  * @param boostCount ブースト回数
@@ -94,7 +94,7 @@ function grantXP(userId: string, xp: number, boostCount: number, isBoosting: boo
     
     if (isBoosting) { // ブースト有効
         messageBonusMap.set(userId, boostCount + 1);
-        console.log(`[ボーナステスト] user_id=${userId} 回数更新, 現在: ${messageBonusMap.get(userId)}`);
+        console.log(`[ボーナス] user_id=${userId} 回数更新, 現在: ${messageBonusMap.get(userId)}`);
     }
 
     let earnedXp: number = earnedXpMap.get(userId) || 0; // 1週間に稼いだ経験値

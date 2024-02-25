@@ -33,25 +33,28 @@ module.exports = {
         const isBonus = vcBonusMap.get(userId) ? vcBonusMap.get(userId)! < 600 : true; // ボーナス適用するか (初接続 or 600s未満だったら、true)
 
         try {
-            if (oldState?.channel === null && newState?.channel !=  null) { // 入った
+            /**
+             * レベルシステム
+             */
+            if (oldState?.channel === null && newState?.channel !=  null) { // 入った時
                 vcConnectTimeMap.set(userId, unixTimeStamp);
                 console.log(`[VC接続] user_id: ${userId}, unixTimeStamp(JoinedTime): ${unixTimeStamp}`);
-            } else if (oldState?.channel != null && newState?.channel === null) { // 抜けた
+            } else if (oldState?.channel != null && newState?.channel === null) { // 抜けた時
                 grantXP(userId, vcConnectTime, unixTimeStamp, isBonus);
                 vcConnectTimeMap.delete(userId);
-            } else if (oldState?.channel != null && newState?.channel != null) { // 移動
+            } else if (oldState?.channel != null && newState?.channel != null) { // 移動した時
                 grantXP(userId, vcConnectTime, unixTimeStamp, isBonus);
                 vcConnectTimeMap.delete(userId);
             }
 
-            if (user) { // データある
+            if (user) { // データがある場合、更新する
                 await prisma.levels.updateMany({
                     where: { user_id: userId },
                     data: { user_xp: user.user_xp + xp }
                 });
 
                 grantRole(userId, guild, user.user_xp + xp); // 役職付与
-            } else {
+            } else { // データがない場合、作成する
                 await prisma.levels.create({
                     data: {
                         user_id: userId,
@@ -61,7 +64,9 @@ module.exports = {
 
                 grantRole(userId, guild, xp); // 役職付与
             }
-            
+            /**
+             * ボイスチャンネルのログを取る処理
+             */
             // ユーザー名とボイスチャンネル名を取得
             const newMember = newState.member;
             const oldMember = oldState.member;
