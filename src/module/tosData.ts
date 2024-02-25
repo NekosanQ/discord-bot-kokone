@@ -8,7 +8,7 @@ interface Embeds {
     completed: EmbedBuilder,
     authenticated: EmbedBuilder,
     failed: EmbedBuilder,
-    rule: EmbedBuilder[]
+    tos: EmbedBuilder[]
 }
 
 /**
@@ -63,7 +63,7 @@ export const embeds: Embeds = {
         .setTitle("認証失敗/Authentication failed")
         .setDescription("認証に失敗しました。もう一度やり直してください。\nAuthentication failed. Please try again."),
     // 利用規約
-    rule: [
+    tos: [
         new EmbedBuilder() // 日本語(デフォルト)
             .setColor(Number(config.botColor))
             .setTitle("猫の隠れ家 利用規約")

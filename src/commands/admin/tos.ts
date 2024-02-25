@@ -1,5 +1,5 @@
 import { Interaction, PermissionsBitField, SlashCommandBuilder, StringSelectMenuInteraction } from "discord.js";
-import { languageMenu, embeds, agreeButton } from "../../module/ruledata";
+import { languageMenu, embeds, agreeButton } from "../../module/tosData";
 import { appendFile } from "../../module/file/appedFile";
 import { config } from "../../utils/config";
 import { logger } from "../../utils/log";
@@ -14,7 +14,7 @@ module.exports = {
         
         if (interaction.isChatInputCommand()&&interaction.member?.permissions.has(PermissionsBitField.Flags.Administrator)) {
             await interaction.reply({
-                embeds: [embeds.rule[0]],
+                embeds: [embeds.tos[0]],
                 components: [languageMenu, agreeButton]
             });
             return;
@@ -26,7 +26,7 @@ module.exports = {
         if (interaction.customId === "selectlanguage") { // 言語を選択した時の処理
             const page: number = Number((interaction as StringSelectMenuInteraction).values[0].split("_")[1]);
             await interaction.reply({
-                embeds: [embeds.rule[page + 1]],
+                embeds: [embeds.tos[page + 1]],
                 ephemeral: true,
             });
         }
