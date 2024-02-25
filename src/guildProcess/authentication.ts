@@ -13,7 +13,11 @@ const certificationButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilde
         new ButtonBuilder()
             .setCustomId("certificationButton")
             .setLabel("認証を開始する")
-            .setStyle(ButtonStyle.Success)
+            .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+            .setCustomId("changeButton")
+            .setLabel("🔄️")
+            .setStyle(ButtonStyle.Primary)
     )
 /**
  * 認証するためのモーダル
@@ -44,6 +48,10 @@ const timeoutCountMap = new Map<string, number>();
  */
 const timeoutMap = new Map<string, NodeJS.Timeout>();
 /**
+ * 認証コードをリセットするマップ
+ */
+const resetMap = new Map<string, NodeJS.Timeout>();
+/**
  * 認証をする処理
  */
 module.exports = {
@@ -54,17 +62,24 @@ module.exports = {
          */
         const certificationEmbed: EmbedBuilder = new EmbedBuilder()
             .setColor(Number(config.botColor))
-            .setTitle("認証テスト")
-            .setDescription("以下の画像の緑色のテキストを読み取り、認証を開始してください")
+            .setTitle("画像認証")
+            .setDescription("以下の画像の緑色のテキストを読み取り、認証を開始してください。\n※5分間有効")
             .setImage(`attachment://${interaction.user.id}.png`)
 
         if (interaction.isButton()) { // ボタンを押したときの処理
-            if (interaction.customId === "agreeButton") { // 認証を開始させるボタン
+            if (["agreeButton", "changeButton"].includes(interaction.customId)) { // 認証を開始させるボタン
                 const authenticationArray = await authenticationProcess(interaction);
                 const authenticationCode = authenticationArray[0] as string; // 認証コード
                 const attachment = authenticationArray[1]; // 認証画像
                 authenticationMap.set(interaction.user.id, authenticationCode); // 認証コードをセット
                 timeoutCountMap.set(interaction.user.id, 3); // 失敗回数
+                const timeout = setTimeout(() => { // 5分後に処理するタイムアウトを作成
+                    logger.info(`認証コードをリセットしました: ${interaction.user.displayName}/${interaction.user.id}`);
+                    authenticationMap.set(interaction.user.id, "timeout"); // 認証コードをセット
+                    timeoutMap.delete(interaction.user.id); // タイムアウトの削除
+                }, 5 * 60 * 1000);
+                resetMap.set(interaction.user.id, timeout )
+
                 await interaction.reply({ // 認証画面表示
                     embeds: [certificationEmbed],
                     components: [certificationButton],
@@ -85,8 +100,13 @@ module.exports = {
         } else if (interaction.isModalSubmit()) { // 認証結果
             const sendCode = interaction.fields.getTextInputValue('authenticationInput'); // 送信されたコード
             const authenticationCode = authenticationMap.get(interaction.user.id); // 認証コードを取得
-
-            if (sendCode === authenticationCode) { // 一致してた場合の処理
+            if (authenticationCode === "timeout") {
+                await interaction.reply({
+                    content: "認証コード作成から5分が経過した為、認証コードが無効になりました。作成しなおしてください。",
+                    ephemeral: true
+                });
+                return;
+            } else if (sendCode === authenticationCode) { // 一致してた場合の処理
                 if (interaction.channel?.id === config.tosChannelId) { // 利用規約での処理
                     await interaction.deferReply({
                         ephemeral: true 
@@ -111,7 +131,7 @@ module.exports = {
                     const timeout = setTimeout(() => { // 5分後に処理するタイムアウトを作成
                         logger.info(`認証タイムアウト解除: ${interaction.user.displayName}/${interaction.user.id}`);
                         timeoutMap.delete(interaction.user.id); // タイムアウトの削除
-                    }, 10 * 1000);
+                    }, 10 * 60 * 1000);
                     timeoutMap.set(interaction.user.id, timeout); // マップにタイムアウトをセット
                     await interaction.reply({
                         content: "失敗回数が多すぎるので、一時的に認証が出来なくなりました。\n時間を置いてやり直してください。",
