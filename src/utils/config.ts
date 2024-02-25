@@ -28,6 +28,7 @@ export interface Config {
     errorColor: string;
     defaultVoiceChannelList: string[];
     inviteRoleId: string[];
+    roleIds: string[];
 };
 
 // コンフィグファイルを読み込む

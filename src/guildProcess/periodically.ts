@@ -5,6 +5,9 @@ import path from "node:path";
 import { config } from "../utils/config";
 import { writeFile } from "../module/file/writeFile";
 import { appendFile } from '../module/file/appedFile';
+
+import { periodicExecution } from "../module/periodicExecution";
+
 /**
  * 毎日0時になったら処理をするシステム
  */
@@ -28,6 +31,9 @@ module.exports = {
                     }
                 });
             }
+            cron.schedule("0 0 * * 6", async () => { // 毎週土曜日 午前0時0分 (0 0 * * 6)
+                await periodicExecution(client);
+            });
         } catch (error) {
             appendFile("logs/error.log", `[${date}] ${error}`);
         }
