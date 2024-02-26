@@ -6,7 +6,7 @@ import { config } from "../utils/config";
 import { writeFile } from "../module/file/writeFile";
 import { appendFile } from '../module/file/appedFile';
 
-import { periodicExecution } from "../module/periodicExecution";
+import { periodicDayExecution, periodicWeekExecution } from "../module/periodicExecution";
 
 /**
  * 毎日0時になったら処理をするシステム
@@ -19,7 +19,7 @@ module.exports = {
             if (getLogChannelId) {
                 const logsPath: string = path.join(__dirname, '../../logs');
                 const logFiles: string[] = fs.readdirSync(logsPath).filter(file => file.endsWith('.log'));
-                cron.schedule("0 0 0 * * *", () => { // 0時になったら実行
+                cron.schedule("0 0 0 * * *", async () => { // 0時になったら実行
                     for (const file of logFiles) { // logsフォルダのlogファイルを全て取得
                         const filePath: string = path.join(logsPath, file);
                         (getLogChannelId as TextChannel).send({
@@ -29,10 +29,11 @@ module.exports = {
                             writeFile(filePath, "");
                         }, 1000);
                     }
+                    await periodicDayExecution();
                 });
             }
             cron.schedule("0 0 * * 6", async () => { // 毎週土曜日 午前0時0分 (0 0 * * 6)
-                await periodicExecution(client);
+                await periodicWeekExecution(client);
                 console.log("レベルの更新をしました");
             });
         } catch (error) {

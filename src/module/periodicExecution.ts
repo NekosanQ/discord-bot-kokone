@@ -29,9 +29,9 @@ export const earnedXpMap = new Map<string, number>();
 /**
  *  ボイスチャンネル滞在
  * 
-    @type {string} ユーザーId
-    @type {number} 接続した時間(UNIX TIME)
-*/
+ *  @type {string} ユーザーId
+ * @type {number} 接続した時間(UNIX TIME)
+ */
 export const vcConnectTimeMap = new Map<string, number>();
 
 /**
@@ -47,12 +47,11 @@ const levelsNorma: number[] = [50000, 20000, 5000];
 const roles : string[] = config.roleIds.slice(2, 5).reverse();
 
 /**
- * XP減少 / 役職剥奪 / ボーナス回数, その週稼いだXP記録 リセット
+ * ボーナス回数 リセット
  * @param client クライアント
  */
-export async function periodicExecution(client: Client): Promise<void> {
+export async function periodicDayExecution(): Promise<void> {
     try {
-        const guild = await client.guilds.fetch(config.generalGuildId);
         const users = await prisma.levels.findMany({
             select: {
                 user_id: true,
@@ -62,6 +61,50 @@ export async function periodicExecution(client: Client): Promise<void> {
 
         const now = new Date();
         const unixTimeStamp = Math.floor(now.getTime() / 1000);
+
+        for (const user of users) {
+            const id: string = user.user_id;
+
+            const vcUser: number | undefined = vcConnectTimeMap.get(id);
+            if (vcUser) { // VC接続中
+                console.log(`user_id: ${id} VC レベル更新`);
+
+                const isBonus = vcBonusMap.get(id) ? vcBonusMap.get(id)! < 600 : true; // ボーナス適用するか (初接続 or 600s未満だったら、true)
+                const xp = grantXP(id, vcUser, unixTimeStamp, isBonus);
+
+                const user = await prisma.levels.findFirst({
+                    select: { user_xp: true },
+                    where: { user_id: id }
+                });
+
+                await updateXP(id, user?.user_xp || 0 + xp!);
+                vcConnectTimeMap.set(id, unixTimeStamp); // 接続開始時間更新
+            } else {
+                console.log(`user_id: ${id} VC レベル更新なし`);
+            }
+        }
+
+        // リセット
+        messageBonusMap.clear();	// メッセージ
+        vcBonusMap.clear();			// VC
+        console.log(`リセットした！`);
+    } catch (error) {
+        console.log(error);
+    }
+}
+/**
+ * XP減少 / 役職剥奪, その週稼いだXP記録 リセット
+ * @param client クライアント
+ */
+export async function periodicWeekExecution(client: Client): Promise<void> {
+    try {
+        const guild = await client.guilds.fetch(config.generalGuildId);
+        const users = await prisma.levels.findMany({
+            select: {
+                user_id: true,
+                user_xp: true
+            }
+        });
 
         for (const user of users) {
             const xp: number = user.user_xp;
@@ -79,32 +122,13 @@ export async function periodicExecution(client: Client): Promise<void> {
                     break;
                 }
             }
-
-            const vcUser: number | undefined = vcConnectTimeMap.get(id);
-            if (vcUser) { // VC接続中
-                console.log(`user_id: ${id} VC レベル更新`);
-
-                const isBonus = vcBonusMap.get(id) ? vcBonusMap.get(id)! < 600 : true; // ボーナス適用するか (初接続 or 600s未満だったら、true)
-                const xp = grantXP(id, vcUser, unixTimeStamp, isBonus);
-
-                const user = await prisma.levels.findFirst({
-                    select: { user_xp: true },
-                    where: { user_id: id }
-                });
-
-                await updateXP(id, user?.user_xp || 0 + xp!);
-                vcConnectTimeMap.set(id, unixTimeStamp); // 接続開始時間更新
-            } else 
-                console.log(`user_id: ${id} VC レベル更新なし`);
         }
 
         // リセット
-        messageBonusMap.clear();	// メッセージ
-        vcBonusMap.clear();			// VC
-        earnedXpMap.clear();		// その日稼いだXP
+        earnedXpMap.clear();		// その週稼いだXP
         console.log(`リセットした！`);
-    } catch (ex) {
-        console.log(ex);
+    } catch (error) {
+        console.log(error);
     }
 };
 
