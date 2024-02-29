@@ -108,7 +108,8 @@ module.exports = {
                         await interaction.showModal(certificationModal);
                     }
                 }
-            } else if (interaction.isModalSubmit()) { // 認証結果
+            } else if (interaction.isModalSubmit()) { // 認証結果]
+                console.log(interaction.fields);
                 const sendCode = interaction.fields.getTextInputValue('authenticationInput'); // 送信されたコード
                 const authenticationCode = authenticationMap.get(interaction.user.id); // 認証コードを取得
                 if (authenticationCode === "timeout") {

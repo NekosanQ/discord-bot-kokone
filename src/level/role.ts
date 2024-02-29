@@ -1,11 +1,11 @@
-import { Guild, Message } from "discord.js";
+import { Guild } from "discord.js";
 import { config } from "../utils/config";
 
 /**
  * 役職がもらえる基準
  * @type {number[]} 基準となるレベル
  */
-const levels: number[] = [1000000, 500000, 200000, 50000, 100];
+const levels: number[] = [500000, 200000, 50000, 10000, 1000];
 
 /**
  * 役職を付与する
