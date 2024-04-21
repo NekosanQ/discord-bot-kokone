@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Message, AttachmentBuilder, GuildMember, ButtonBuilder, ButtonStyle, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, Interaction } from "discord.js";
+import { EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, Interaction } from "discord.js";
 import { authenticationProcess, authenticationMap } from "../module/imageGenerate";
 import { config } from "../utils/config";
 import { appendFile } from "../module/file/appedFile";
@@ -89,7 +89,7 @@ module.exports = {
                         authenticationMap.set(interaction.user.id, "timeout"); // 認証コードをtimeoutし無効化
                         timeoutMap.delete(interaction.user.id); // タイムアウトの削除
                     }, 5 * 60 * 1000);
-                    resetMap.set(interaction.user.id, timeout)
+                    resetMap.set(interaction.user.id, timeout);
 
                     await interaction.reply({ // 認証画面表示
                         embeds: [certificationEmbed],
@@ -108,10 +108,10 @@ module.exports = {
                         await interaction.showModal(certificationModal);
                     }
                 }
-            } else if (interaction.isModalSubmit()) { // 認証結果]
-                console.log(interaction.fields);
+            } else if (interaction.isModalSubmit()) { // 認証結果
                 const sendCode = interaction.fields.getTextInputValue('authenticationInput'); // 送信されたコード
-                const authenticationCode = authenticationMap.get(interaction.user.id); // 認証コードを取得
+                console.log(sendCode);
+                const authenticationCode = authenticationMap.get(interaction.user.id); // 認証コードを取得 
                 if (authenticationCode === "timeout") {
                     await interaction.reply({
                         content: "認証コード作成から5分が経過した為、認証コードが無効になりました。作成しなおしてください。",

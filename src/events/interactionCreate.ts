@@ -1,5 +1,6 @@
 import { Events, Interaction } from 'discord.js';
 import { CustomCommand } from '../types/client';
+import { config } from "../utils/config";
 /**
  * インタラクション処理
  */
@@ -29,8 +30,11 @@ module.exports = {
 			}
 		} else if (!command) {
 			try {
-				await require("../guildProcess/authentication").execute(interaction);
-				await require("../guildProcess/voiceCreateInteraction").execute(interaction);
+				if (interaction.channel?.id === config.tosChannelId) {
+					await require("../guildProcess/authentication").execute(interaction);
+				} else {
+					await require("../guildProcess/voiceCreateInteraction").execute(interaction);
+				}
 			} catch (error) {
 				console.log(error);
 			}
