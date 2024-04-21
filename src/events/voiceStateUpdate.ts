@@ -1,6 +1,6 @@
 import { Events, VoiceState, } from "discord.js";
 import { appendFile } from '../module/file/appedFile';
-import { vcConnectTimeMap, vcBonusMap, earnedXpMap } from "../module/periodicExecution";
+import { vcConnectTimeMap, vcBonusMap } from "../module/periodicExecution";
 import { PrismaClient } from "@prisma/client";
 import { grantRole } from "../level/role";
 import { grantXP } from "../level/grantXP";
@@ -40,10 +40,10 @@ module.exports = {
                 vcConnectTimeMap.set(userId, unixTimeStamp);
                 console.log(`[VC接続] user_id: ${userId}, unixTimeStamp(JoinedTime): ${unixTimeStamp}`);
             } else if (oldState?.channel != null && newState?.channel === null) { // 抜けた時
-                grantXP(userId, vcConnectTime, unixTimeStamp, isBonus);
+                xp = grantXP(userId, vcConnectTime, unixTimeStamp, isBonus);
                 vcConnectTimeMap.delete(userId);
             } else if (oldState?.channel != null && newState?.channel != null) { // 移動した時
-                grantXP(userId, vcConnectTime, unixTimeStamp, isBonus);
+                xp = grantXP(userId, vcConnectTime, unixTimeStamp, isBonus);
                 vcConnectTimeMap.delete(userId);
             }
 
@@ -64,6 +64,7 @@ module.exports = {
 
                 grantRole(userId, guild, xp); // 役職付与
             }
+
             /**
              * ボイスチャンネルのログを取る処理
              */

@@ -95,12 +95,10 @@ module.exports = {
  */
 function grantXP(userId: string, xp: number, boostCount: number, isBoosting: boolean, isVoiceChannel: boolean) : number {
     let earnExp: number = Math.floor(Math.random() * 50) + 1;   // 獲得経験値。 1 - 50
-    earnExp = isBoosting ? earnExp * 5 : earnExp;               // ブースト有効時は5倍
+    earnExp = isBoosting ? earnExp * 10 : earnExp;               // ブースト有効時は10倍
     if (isVoiceChannel) {
         earnExp = Math.floor(Math.random() * 10) + 1;
-    }
-    
-    if (isBoosting) { // ブースト有効
+    } else if (isBoosting) { // ブースト有効
         messageBonusMap.set(userId, boostCount + 1);
         console.log(`[ボーナス] user_id=${userId} 回数更新, 現在: ${messageBonusMap.get(userId)}`);
     }
