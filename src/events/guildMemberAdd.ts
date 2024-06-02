@@ -19,7 +19,7 @@ module.exports = {
             entrance: new EmbedBuilder() // 入退室
                 .setTitle(`__❀ᴡᴇʟᴄᴏᴍᴇ to ${member.guild.name}❀__！`)
                 .setDescription(`<@${member.id}> さんようこそ！\n${member.guild.name}へ！\n<#685127547662630954>\n利用規約を見てください！\nLet's confirm the rules!\n${member.guild.memberCount}人目の入室者です！`)
-                .setColor(Number(config.botColor))
+                .setColor(Number(config.botColor))  
                 .setThumbnail(member.user.avatarURL())
                 .setTimestamp()
                 .setFooter({ text: "入室日時", iconURL: member.user.avatarURL() || undefined }),

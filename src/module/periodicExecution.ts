@@ -87,7 +87,7 @@ export async function periodicDayExecution(): Promise<void> {
         // リセット
         messageBonusMap.clear();	// メッセージ
         vcBonusMap.clear();			// VC
-        console.log(`リセットした！`);
+        console.log(`ボーナス情報をリセットしました`);
     } catch (error) {
         console.log(error);
     }
@@ -114,6 +114,7 @@ export async function periodicWeekExecution(client: Client): Promise<void> {
             const rolesAtMe = (await guild.members.fetch(id)).roles; // そのユーザーが持っている役職をすべて取得する
 
             for (let i = 0; i < levelsNorma.length; i++) {
+                
                 if (levelsNorma[i] > get && rolesAtMe.cache.has(roles[i])) { // ノルマ未達成
                     const decrease = levelsNorma[i] - get; // ノルマ - 獲得
                     await updateXP(id, xp - decrease);

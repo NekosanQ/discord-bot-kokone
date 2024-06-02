@@ -1,4 +1,4 @@
-import { Interaction, AttachmentBuilder, GuildMember } from "discord.js";
+import { Interaction, AttachmentBuilder, GuildMember, CommandInteraction } from "discord.js";
 import canvas from '@napi-rs/canvas';
 import { request } from 'undici';
 import crypto from 'crypto';
@@ -6,7 +6,11 @@ import crypto from 'crypto';
  * 認証コードを保存するマップ
  */
 export const authenticationMap = new Map<string, string>();
-
+/**
+ * 認証システム
+ * @param interaction インタラクション
+ * @returns 認証画像, 認証コード
+ */
 export async function authenticationProcess(interaction: Interaction): Promise<(string | AttachmentBuilder)[]> {
     const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }); // 現在時刻を取得
     const canvasWidth = 700; // 
@@ -15,7 +19,7 @@ export async function authenticationProcess(interaction: Interaction): Promise<(
     const { body } = await request((interaction.member as GuildMember).displayAvatarURL({ extension: 'png' }));
     const avatar = await canvas.loadImage(await body.arrayBuffer());
     const context = ctx.getContext('2d');
-    context.font = "70px Noto Sans CJK JP";
+    context.font = "70px Yu Gothic UI";
         
     let authenticationCode: string;
    /**
@@ -54,14 +58,14 @@ export async function authenticationProcess(interaction: Interaction): Promise<(
     /**
      * ユーザー情報
      */
-    context.font = "30px Noto Sans CJK JP";
+    context.font = "30px Yu Gothic UI";
     context.fillStyle = "#f5f5f5";
     const member = interaction.member as GuildMember;
     context.fillText(`${member.displayName} 画像認証`, 100, 55);
     /**
      * ユーザーIDと実行時刻
      */
-    context.font = "10px Noto Sans CJK JP";
+    context.font = "10px Yu Gothic UI";
     context.fillText(`${date}-${member.id}`, 450, 250);
     
     /**
@@ -87,4 +91,49 @@ export async function authenticationProcess(interaction: Interaction): Promise<(
     ];
     
     return authenticationArray;
+}
+/**
+ * プロフィール画像生成プログラム
+ * @param interaction インタラクション
+ * @returns プロフィール画像
+ */
+export async function profileGenerate(interaction: CommandInteraction): Promise<AttachmentBuilder> {
+    const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }); // 現在時刻を取得
+    const canvasWidth = 700; // 
+    const canvasHeight = 250
+    const ctx = canvas.createCanvas(canvasWidth, canvasHeight);  // 空のキャンバスを作る
+    const { body } = await request((interaction.member as GuildMember).displayAvatarURL({ extension: 'png' }));
+    const avatar = await canvas.loadImage(await body.arrayBuffer());
+    const context = ctx.getContext('2d');
+    context.font = "70px Yu Gothic UI";
+
+    /**
+     * ユーザー情報
+     */
+    context.font = "30px Yu Gothic UI";
+    context.fillStyle = "#f5f5f5";
+    const member = interaction.member as GuildMember;
+    context.fillText(`${member.displayName}`, 100, 55);
+    
+    /**
+     * ユーザーアイコンを丸める
+     */
+    context.beginPath();
+    context.arc(45, 45, 40, 0, Math.PI * 2);
+    context.closePath();
+    context.clip();
+    /**
+     * ユーザーアイコン
+     */
+    context.drawImage(avatar, 5, 5, 80, 80);
+    context.strokeRect(0, 0, ctx.width, ctx.height);
+    /**
+     * 現在のランク
+     */
+    /**
+     * エンコード
+     */
+    const attachment = new AttachmentBuilder(await ctx.encode('png'), { name: `${interaction.user.id}.png` });
+
+    return attachment;
 }

@@ -30,12 +30,12 @@ module.exports = {
                         }, 1000);
                     }
                     await periodicDayExecution();
-                });
+                })
             }
             cron.schedule("0 0 * * 6", async () => { // 毎週土曜日 午前0時0分 (0 0 * * 6)
                 await periodicWeekExecution(client);
                 console.log("レベルの更新をしました");
-            });
+            })
         } catch (error) {
             appendFile("logs/error.log", `[${date}] ${error}`);
         }
