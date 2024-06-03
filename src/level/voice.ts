@@ -8,6 +8,8 @@ const prisma = new PrismaClient();
 
 module.exports = {  
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
+        console.log(oldState.channel?.id);
+        console.log(config.afkChannelId);
         if (oldState.channel?.id === config.afkChannelId) return; // 放置チャンネルはXPを付与しない
         const now = new Date();
         const unixTimeStamp = Math.floor(now.getTime() / 1000);
