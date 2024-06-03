@@ -186,14 +186,12 @@ export const allowUserPermisson: bigint[] = [
     PermissionsBitField.Flags.AttachFiles,            // ファイルを添付
     PermissionsBitField.Flags.ReadMessageHistory,     // メッセージ履歴を読む
     PermissionsBitField.Flags.AddReactions,           // リアクションの追加
-    PermissionsBitField.Flags.UseExternalEmojis,      // 外部の絵文字の使用
-    PermissionsBitField.Flags.UseExternalStickers,    // 外部のスタンプの使用
-    PermissionsBitField.Flags.UseExternalSounds,      // 外部のサウンドボードの使用
     PermissionsBitField.Flags.UseSoundboard,          // サウンドボードの使用
     PermissionsBitField.Flags.UseApplicationCommands, // アプリケーションコマンドの使用
     PermissionsBitField.Flags.Connect,                // 接続
     PermissionsBitField.Flags.Speak,                  // 発言
     PermissionsBitField.Flags.Stream,                 // 配信
+    PermissionsBitField.Flags.UseEmbeddedActivities,  // アクティビティの使用
     PermissionsBitField.Flags.UseVAD                  // 音声検出を使用
 ];
 /**
@@ -204,6 +202,9 @@ export const allowCreateUserPermisson: bigint[] = [
     PermissionsBitField.Flags.DeafenMembers,          // メンバーをスピーカーミュート
     PermissionsBitField.Flags.ManageMessages,         // メッセージの管理
     PermissionsBitField.Flags.ManageChannels,         // チャンネルの管理
+    PermissionsBitField.Flags.UseExternalEmojis,      // 外部の絵文字の使用
+    PermissionsBitField.Flags.UseExternalStickers,    // 外部のスタンプの使用
+    PermissionsBitField.Flags.UseExternalSounds,      // 外部のサウンドボードの使用
     PermissionsBitField.Flags.Connect,                // 接続
     PermissionsBitField.Flags.Speak,                  // 発言
     PermissionsBitField.Flags.UseVAD                  // 音声検出を使用
