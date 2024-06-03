@@ -14,8 +14,8 @@ chatChannelId = "1189556244260851859"
 inviteChannelId = "1189556244604788768"
 # VC作成チャンネル
 voiceCreateChannelId = "1189556244604788769"
-# 待機部屋チャンネル
-voiceWaitingRoomId = "1198502640838004807"
+# 放置部屋チャンネル
+afkChannel = "1247212314621378582";
 # 運営部屋
 managementChannelId = "1189556244965490702"
 # ログ出力チャンネル

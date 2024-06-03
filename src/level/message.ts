@@ -13,9 +13,9 @@ const coolDownMap = new Map<string, number>();
 
 module.exports = {
     async execute(message: Message): Promise<void> {
-        const now = Date.now();
-
         if (message.guild === null) return; // 実行場所がサーバーでなかったら処理しない
+        
+        const now = Date.now();
         
         const coolDowndate = coolDownMap.get(message.author.id);
 

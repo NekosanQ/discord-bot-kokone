@@ -1,5 +1,5 @@
 import { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Message, TextChannel, VoiceChannel } from "discord.js";
-import { config } from "../../utils/config"
+import { config } from "../../utils/config";
 
 /**
  * 作成したVCの設定画面のメッセージリンクを送信する処理

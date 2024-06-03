@@ -17,6 +17,7 @@ export interface Config {
     chatChannelId: string;
     inviteChannelId: string;
     voiceCreateChannelId: string;
+    afkChannelId: string;
     managementChannelId: string;
     logChanneld: string;
     checkMarkId: string;
