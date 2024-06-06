@@ -1,5 +1,5 @@
 import { CommandInteraction, EmbedBuilder, SlashCommandBuilder, Message } from "discord.js";
-import { config } from "../../utils/config"
+import { config } from "../../utils/config";
 
 /**
  * Pingを表示する処理

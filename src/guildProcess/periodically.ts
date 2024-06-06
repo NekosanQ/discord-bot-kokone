@@ -15,14 +15,14 @@ module.exports = {
     async execute(client: Client): Promise<void> {
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         try {
-            const getLogChannelId: Channel | undefined = client.channels.cache.get(config.logChanneld); // 運営チャンネルを取得
-            if (getLogChannelId) {
+            const getLogChannel: Channel | undefined = client.channels.cache.get(config.logChannelId); // 運営チャンネルを取得
+            if (getLogChannel) {
                 const logsPath: string = path.join(__dirname, '../../logs');
                 const logFiles: string[] = fs.readdirSync(logsPath).filter(file => file.endsWith('.log'));
                 cron.schedule("0 0 0 * * *", async () => { // 0時になったら実行
                     for (const file of logFiles) { // logsフォルダのlogファイルを全て取得
                         const filePath: string = path.join(logsPath, file);
-                        (getLogChannelId as TextChannel).send({
+                        (getLogChannel as TextChannel).send({
                             files: [filePath]
                         });
                         setTimeout(() => { // ファイルを送信した1秒後に上書きする

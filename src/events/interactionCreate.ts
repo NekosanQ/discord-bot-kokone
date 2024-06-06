@@ -7,6 +7,13 @@ import { config } from "../utils/config";
 module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction: Interaction): Promise<void> {
+		// コンテキストのメニューによってファイル別に読み込む
+		if (interaction.isMessageContextMenuCommand()) {
+			await require("../commands/general/reportMessage").execute(interaction);
+		} else if (interaction.isUserContextMenuCommand()) {
+			await require("../commands/general/reportUser").execute(interaction);
+		}
+
 		let commandName: string;
 		// インタラクションの種類によってcommandNameを取得
 		if (interaction.isChatInputCommand()) {
@@ -34,6 +41,7 @@ module.exports = {
 					await require("../guildProcess/authentication").execute(interaction);
 				} else {
 					await require("../guildProcess/voiceCreateInteraction").execute(interaction);
+					await require("../guildProcess/reportModal").execute(interaction);
 				}
 			} catch (error) {
 				console.log(error);

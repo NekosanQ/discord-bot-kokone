@@ -19,7 +19,7 @@ export interface Config {
     voiceCreateChannelId: string;
     afkChannelId: string;
     managementChannelId: string;
-    logChanneld: string;
+    logChannelId: string;
     checkMarkId: string;
     uncertifiedRoleId: string;
     authenticatedRoleId: string;

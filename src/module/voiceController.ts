@@ -16,8 +16,6 @@ import {
     ButtonStyle,
     OverwriteType,
     GuildMember,
-    ModalBuilder,
-    VoiceChannel,
     TextChannel
 } from "discord.js";
 
@@ -157,14 +155,12 @@ export let settingButton: ActionRowBuilder<ButtonBuilder>;
 export const defaultSettingButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(publicButton, reloadButton)
 /**
- * VCのオーナーの変更を行う際のモーダル
+ * VCのオーナーの変更を行う際の埋め込みメッセージ
  */
 export const transferOwnershipEmbed: EmbedBuilder = new EmbedBuilder()
     .setColor(Number(config.botColor))
     .setTitle("VCのオーナーの変更")
-    .setDescription(
-        "他の人にVCの管理権限を渡します\n設定を行いたい場合、下のメニューから設定を行ってください。",
-    );
+    .setDescription("他の人にVCの管理権限を渡します\n設定を行いたい場合、下のメニューから設定を行ってください。",);
 /**
  * 譲渡するユーザーを選択するためのセレクトメニュー
  */
