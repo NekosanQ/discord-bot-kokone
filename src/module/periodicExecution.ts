@@ -38,7 +38,7 @@ export const vcConnectTimeMap = new Map<string, number>();
  * 経験値獲得ノルマ
  * @type {number[]} 経験値獲得のノルマ
  */
-const levelsNorma: number[] = [50000, 20000, 5000];
+const levelsNorma: number[] = [25000, 10000, 5000];
 
 /**
  * 使う役職

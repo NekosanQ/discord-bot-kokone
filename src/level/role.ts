@@ -5,7 +5,7 @@ import { config } from "../utils/config";
  * 役職がもらえる基準
  * @type {number[]} 基準となるレベル
  */
-const levels: number[] = [500000, 200000, 50000, 10000, 1000];
+const levels: number[] = [250000, 100000, 50000, 10000, 1000];
 
 /**
  * 役職を付与する
