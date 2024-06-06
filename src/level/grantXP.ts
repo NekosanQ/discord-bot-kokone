@@ -33,7 +33,7 @@ export function grantXP(userId: string, joinedTime: number, leftTime: number, is
  * @returns 与える経験値
  */
 function calculateEarnExp(connectionTime: number, isBonus: boolean): number {
-    const expPer10Sec = Math.floor(connectionTime / 10); // 経験値(10秒で1XP)
+    const expPer10Sec = Math.floor(connectionTime / 2); // 経験値(2秒で1XP)
     if (isBonus) { // ボーナス有効時
         return expPer10Sec <= 60 ? expPer10Sec * 2 : (60 - expPer10Sec) * -1 + 60 * 2; // 60xp以下であれば、そのまま2倍
     } else {
