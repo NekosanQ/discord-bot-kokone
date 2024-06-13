@@ -1,17 +1,17 @@
-import { Events, Interaction } from 'discord.js';
+import { Events, Interaction, ModalSubmitInteraction } from 'discord.js';
 import { CustomCommand } from '../types/client';
 import { config } from "../utils/config";
 /**
  * インタラクション処理
  */
-module.exports = {
+export = {
 	name: Events.InteractionCreate,
 	async execute(interaction: Interaction): Promise<void> {
 		// コンテキストのメニューによってファイル別に読み込む
 		if (interaction.isMessageContextMenuCommand()) {
-			await require("../commands/general/reportMessage").execute(interaction);
+			(await import("../commands/general/reportMessage")).execute(interaction);
 		} else if (interaction.isUserContextMenuCommand()) {
-			await require("../commands/general/reportUser").execute(interaction);
+			(await import("../commands/general/reportUser")).execute(interaction);
 		}
 
 		let commandName: string;
@@ -38,10 +38,10 @@ module.exports = {
 		} else if (!command) {
 			try {
 				if (interaction.channel?.id === config.tosChannelId) {
-					await require("../guildProcess/authentication").execute(interaction);
+					(await import("../guildProcess/authentication")).execute(interaction as Interaction<"cached">);
 				} else {
-					await require("../guildProcess/voiceCreateInteraction").execute(interaction);
-					await require("../guildProcess/reportModal").execute(interaction);
+					(await import("../guildProcess/voiceCreateInteraction")).execute(interaction);
+					(await import("../guildProcess/reportModal")).execute(interaction as ModalSubmitInteraction);
 				}
 			} catch (error) {
 				console.log(error);

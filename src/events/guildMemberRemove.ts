@@ -5,7 +5,7 @@ import { logger } from "../utils/log";
 /**
  * ユーザーが退出した時の処理
  */
-module.exports = {
+export = {
 	name: Events.GuildMemberRemove,
 	async execute(member: GuildMember): Promise<void> {
         const getEntranceChannelId: Channel | undefined = member.guild.channels.cache.get(config.entranceChannelId); // 入退室チャンネルを取得

@@ -131,7 +131,7 @@ export = {
                 case "publicButton":
                 case "startButton":
                 case "confirmationButton": {
-                    await require("../guildProcess/voicePublic").execute(interaction);
+                    (await import("../guildProcess/voicePublic")).execute(interaction);
                     break;
                 }
                 /**
