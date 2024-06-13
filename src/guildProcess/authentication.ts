@@ -54,7 +54,7 @@ const resetMap = new Map<string, NodeJS.Timeout>();
 /**
  * 認証をする処理
  */
-module.exports = {
+export = {
     async execute(interaction: Interaction<"cached">): Promise<void> {
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         /**

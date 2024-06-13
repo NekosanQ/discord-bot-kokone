@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
  */
 const coolDownMap = new Map<string, number>();
 
-module.exports = {
+export = {
     async execute(message: Message): Promise<void> {
         if (message.guild === null) return; // 実行場所がサーバーでなかったら処理しない
         

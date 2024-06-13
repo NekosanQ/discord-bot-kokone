@@ -5,7 +5,7 @@ import { config } from '../utils/config.js';
 /**
  * 荒らし対策システム
  */
-module.exports = {
+export = {
     async execute(message: Message): Promise<void> {
         class DefaultEmbeds {
             title: string;

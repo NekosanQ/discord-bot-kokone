@@ -27,7 +27,7 @@ const startButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<Button
 /**
  * コマンドで作成したVCの設定を行う処理
  */
-module.exports = {
+export = {
     data: new SlashCommandBuilder() // スラッシュコマンド
 		.setName("panel_create")
 		.setDescription("作成したVCの設定画面を表示させます"),

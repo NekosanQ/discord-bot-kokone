@@ -25,7 +25,7 @@ const publicChannelEmbed: EmbedBuilder = new EmbedBuilder()
 /**
  * ボイスチャンネルを公開/ブロックユーザーを確認する処理
  */
-module.exports = {
+export = {
 	async execute(interaction: Interaction): Promise<void> {
         if (!interaction.isButton()) return;
         const userName = interaction.user.displayName;

@@ -1,6 +1,6 @@
 import { Channel, EmbedBuilder, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { config } from "../utils/config";
-module.exports = {
+export = {
     async execute(interaction: ModalSubmitInteraction): Promise<void> {
         if (!interaction.isModalSubmit()) return;
 

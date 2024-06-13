@@ -100,7 +100,7 @@ changeBitrateModal.addComponents(changeBitrateRow);
  * ボイスチャンネル作成のインタラクション処理
  * @param interaction インタラクション
  */
-module.exports = {
+export = {
 	async execute(interaction: Interaction): Promise<void> {
         const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
         const userName: string = interaction.user.displayName;

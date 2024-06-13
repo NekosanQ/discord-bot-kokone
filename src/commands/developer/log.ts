@@ -2,7 +2,7 @@ import { CommandInteraction, SlashCommandBuilder, } from "discord.js";
 /**
  * ログを送信するコマンド
  */
-module.exports = {
+export = {
 	data: new SlashCommandBuilder()
 		.setName("log")
 		.setDescription("ログを送信します"),

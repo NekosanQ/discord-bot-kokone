@@ -36,7 +36,7 @@ const deleteButton: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<Butto
 /**
  * お問い合わせの処理
  */
-module.exports = {
+export = {
     data: new SlashCommandBuilder()
         .setName("ticket")
         .setDescription("お問い合わせを作成します"),

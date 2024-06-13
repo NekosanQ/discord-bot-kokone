@@ -11,7 +11,7 @@ import { periodicDayExecution, periodicWeekExecution } from "../module/periodicE
 /**
  * 毎日0時になったら処理をするシステム
  */
-module.exports = {
+export = {
     async execute(client: Client): Promise<void> {
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         try {

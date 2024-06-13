@@ -4,7 +4,7 @@ import { config } from "../../utils/config";
 /**
  * Pingを表示する処理
  */
-module.exports = {
+export = {
     data: new SlashCommandBuilder() // スラッシュコマンド
 		.setName('ping')
 		.setDescription('pingを表示します'),

@@ -40,7 +40,7 @@ const otherContentActionRow = new ActionRowBuilder<TextInputBuilder>().addCompon
 const messageIdActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(messageIdInput);
 reportModal.addComponents(breachContentActionRow, otherContentActionRow, messageIdActionRow);
 
-module.exports = {
+export = {
     data: new ContextMenuCommandBuilder()
 	    .setName('このメッセージを報告する')
 	    .setType(ApplicationCommandType.Message),

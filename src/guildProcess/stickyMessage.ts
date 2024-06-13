@@ -4,7 +4,7 @@ import { config } from '../utils/config';
 /**
  * Stickyメッセージ
  */
-module.exports = {
+export = {
     async execute(message: Message): Promise<void> {
         if (message.author.bot) return;
         const date: string = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });

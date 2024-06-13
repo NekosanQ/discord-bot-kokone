@@ -6,7 +6,7 @@ import { VoiceState } from "discord.js";
 import { config } from "../utils/config";
 const prisma = new PrismaClient();
 
-module.exports = {  
+export = {  
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
         if (oldState.channel?.id === config.afkChannelId) return; // 放置チャンネルはXPを付与しない
         const now = new Date();

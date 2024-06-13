@@ -22,7 +22,7 @@ const deleteMap = new Map<string, NodeJS.Timeout>();
  * @param oldState 移動前のステータス
  * @param newState 移動後のステータス
  */
-module.exports = {  
+export = {  
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
         const newMember = newState.member;
         const oldMember = oldState.member;

@@ -42,7 +42,7 @@ const userIdActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(u
 
 reportModal.addComponents(breachContentActionRow, otherContentActionRow, userIdActionRow);
 
-module.exports = {
+export = {
     data: new ContextMenuCommandBuilder()
 	    .setName('このユーザーを報告する')
 	    .setType(ApplicationCommandType.User),

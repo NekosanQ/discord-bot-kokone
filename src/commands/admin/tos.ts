@@ -5,7 +5,7 @@ import { config } from "../../utils/config";
 import { logger } from "../../utils/log";
 logger.level = "info";
 
-module.exports = {
+export = {
     data: new SlashCommandBuilder()
         .setName("tos")
         .setDescription("利用規約を作成します"),
@@ -34,7 +34,7 @@ module.exports = {
             try {
                 const role: boolean = interaction.member.roles.cache.has(config.uncertifiedRoleId);
                 if (role) {
-                    await require("../../guildProcess/authentication").execute(interaction)
+                    (await import("../../guildProcess/authentication")).execute(interaction);
                 } else {
                     await interaction.reply({
                         embeds: [embeds.authenticated],
