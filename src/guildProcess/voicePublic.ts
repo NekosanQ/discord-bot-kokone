@@ -1,4 +1,4 @@
-import { ButtonInteraction, EmbedBuilder, GuildMember, Interaction, PermissionsBitField, VoiceBasedChannel, VoiceChannel } from "discord.js";
+import { ButtonInteraction, EmbedBuilder, GuildMember, Interaction, PermissionsBitField, TextChannel, VoiceBasedChannel, VoiceChannel } from "discord.js";
 import { config } from "../utils/config";
 import { appendFile } from "../module/file/appedFile";
 import { 
@@ -61,6 +61,21 @@ export = {
                         ],
                         components: settingComponentUpdate(interaction)
                     });
+                    /**
+                     * コマンドから実行している場合、VC内の設定画面も更新する
+                     */
+                    if (interaction.channel instanceof TextChannel) {
+                        const messages = channel.messages.fetch({ after: '0', limit: 1 }); // メッセージが送信されたチャンネルで一番最初に送信されたメッセージを取得する
+                        const firstMessage = (await messages).first();
+                        if (firstMessage) {
+                           firstMessage.edit({
+                                embeds: [
+                                    publicChannelEmbed.setFields(await channelSettingUpdate(interaction))
+                                ],
+                                components: settingComponentUpdate(interaction) 
+                            })
+                        }
+                    }
                     break
                 }
                 /**
@@ -76,6 +91,7 @@ export = {
                         ],
                         components: settingComponentUpdate(interaction)
                     });
+
                     break;
                 }
                 /**
