@@ -1,18 +1,14 @@
 import { Events, VoiceState, } from "discord.js";
 import { appendFile } from '../module/file/appedFile';
-import { vcConnectTimeMap, vcBonusMap } from "../module/periodicExecution";
 import { PrismaClient } from "@prisma/client";
-import { grantRole } from "../level/role";
-import { grantXP } from "../level/grantXP";
-const prisma = new PrismaClient();
 /**
  * ボイスチャンネルの処理
  */
-module.exports = {
+export = {
     name: Events.VoiceStateUpdate,
     async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
-        await require("../guildProcess/voiceCreate").execute(oldState, newState);
-        await require("../level/voice").execute(oldState, newState);
+        (await import("../guildProcess/voiceCreate")).execute(oldState, newState);
+        (await import("../level/voice")).execute(oldState, newState);
 
         const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         /**

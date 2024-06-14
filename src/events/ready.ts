@@ -3,10 +3,10 @@ import { logger } from "../utils/log";
 /**
  * 起動した時の処理
  */
-module.exports = {
+export = {
 	name: Events.ClientReady,
 	once: false,
-	execute(client: Client) {
+	async execute(client: Client) {
 		const date = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
 		setInterval(() => {
 			client.user?.setActivity({
@@ -14,6 +14,6 @@ module.exports = {
 			});
 		  }, 10000);
 		logger.info(`[INFO] 起動完了: ${client.user?.tag}`);
-		require("../guildProcess/periodically").execute(client);
+		(await import("../guildProcess/periodically")).execute(client);
 	}
 };
