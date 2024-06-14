@@ -5,7 +5,7 @@ import { config } from "../utils/config";
  * 役職がもらえる基準
  * @type {number[]} 基準となるレベル
  */
-const levels: number[] = [250000, 100000, 50000, 10000, 1000];
+const levels: number[] = [1000, 10000, 50000, 100000, 250000];
 
 /**
  * 役職を付与する
@@ -20,11 +20,10 @@ export async function grantRole(userId: string, guild: Guild, xp: number) : Prom
 
     if (member?.roles.highest.position! > bot?.roles.highest.position!) // Botより役職位置が高い人には付与しない
         return;
-    
-    const roles: string[] = config.roleIds.slice(0, 5).reverse(); // 猫神からのロール順序に変更
+     
     for (let i = 0; i < levels.length; i++) {
         if (xp >= levels[i] && !member?.roles.cache.has(config.roleIds[i])) {
-            member?.roles.add(roles[i]);
+            member?.roles.add(config.roleIds[i]);
             break;
         }
     }
