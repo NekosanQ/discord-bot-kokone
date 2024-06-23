@@ -3,47 +3,50 @@ import dotenv from "dotenv"
 import { config } from "./utils/config";
 import fs from 'node:fs';
 import path from 'node:path';
+import { Command } from './types/client';
+import { logger } from './utils/log';
 
 //.envファイルを読み込む
-dotenv.config()
+dotenv.config();
 
-const commands: string[] = [];
-// 作成したcommandsディレクトリから全てのコマンドファイルを取得する。
-const foldersPath: string = path.join(__dirname, 'commands');
-const commandFolders: string[] = fs.readdirSync(foldersPath);
 
-for (const folder of commandFolders) {
-	// 作成したcommandsディレクトリからすべてのコマンドファイルを取得する。
-	const commandsPath: string = path.join(foldersPath, folder);
-	const commandFiles: string[] = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	// 各コマンドのデータをSlashCommandBuilder#toJSON()で出力し、デプロイする。
-	for (const file of commandFiles) {
-		const filePath: string = path.join(commandsPath, file);
-		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
-			commands.push(command.data.toJSON());
-		} else {
-			console.log(`[WARNING] ${filePath}のコマンドには、必須の "data "または "execute "プロパティがありません。`);
+/**
+ * コマンドをデプロイ
+ */
+(async () => {
+	const commands: string[] = [];
+	// 作成したcommandsディレクトリから全てのコマンドファイルを取得する。
+	const foldersPath: string = path.join(__dirname, 'commands');
+	const commandFolders: string[] = fs.readdirSync(foldersPath);
+	for (const folder of commandFolders) {
+		// 作成したcommandsディレクトリからすべてのコマンドファイルを取得する。
+		const commandsPath: string = path.join(foldersPath, folder);
+		const commandFiles: string[] = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+		// 各コマンドのデータをSlashCommandBuilder#toJSON()で出力し、デプロイする。
+		for (const file of commandFiles) {
+			const filePath: string = path.join(commandsPath, file);
+			const command = await (import(filePath));
+			if ('data' in command && 'execute' in command) {
+				commands.push(command.data.toJSON());
+			} else {
+				logger.info(`[WARNING] ${filePath}のコマンドには、必須の "data "または "execute "プロパティがありません。`);
+			}
 		}
 	}
-}
+	
+	// RESTモジュールのインスタンスを構築
+	const rest = new REST().setToken(process.env.DISCORD_TOKEN || "");
 
-// RESTモジュールのインスタンスを構築
-const rest = new REST().setToken(process.env.DISCORD_TOKEN || "");
-
-// コマンドをデプロイ
-(async () => {
 	try {
-		console.log(`${commands.length}アプリケーション（/）コマンドのリフレッシュを開始`);
+		logger.info(`${commands.length}アプリケーション（/）コマンドのリフレッシュを開始`);
 
-		// putメソッドは、ギルド内のすべてのコマンドを現在のセットで完全にリフレッシュするために使用される
-		const data: any = await rest.put(
+		const data = (await rest.put(
 			Routes.applicationGuildCommands(config.clientId, config.generalGuildId),
 			{ body: commands },
-		);
+		)) as Command[];
 
-		console.log(`${data.length}アプリケーション（/）コマンドのリロードに成功`);
+		logger.info(`${data.length}アプリケーション（/）コマンドのリロードに成功`);
 	} catch (error) {
-		console.error(error);
+		logger.error(error);
 	}
 })();

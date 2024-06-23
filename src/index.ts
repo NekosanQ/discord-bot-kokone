@@ -64,4 +64,5 @@ client.commands = new Collection();
 		}
 	}
 })();
+
 client.login(process.env.DISCORD_TOKEN);
